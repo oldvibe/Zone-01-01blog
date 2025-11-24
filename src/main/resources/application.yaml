@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: zerooneblog
+  datasource:
+    url: jdbc:postgresql://localhost:5432/zerooneblog
+    username: user
+    password: password123
+    driver-class-name: org.postgresql.Driver
