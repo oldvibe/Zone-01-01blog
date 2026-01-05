@@ -1,7 +1,10 @@
 package com.blog01.backend.user;
 
+import com.blog01.backend.common.enums.Role;
+
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -29,7 +32,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Builder.Default
     private boolean enabled = true;
 
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 }
+
