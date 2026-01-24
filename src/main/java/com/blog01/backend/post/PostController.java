@@ -45,6 +45,16 @@ public class PostController {
     ) {
         return postService.createPost(user.getId(), request);
     }
+    
+    @PostMapping
+    public void createPost(
+            @RequestParam String content,
+            @RequestParam(required = false) MultipartFile media,
+            @AuthenticationPrincipal UserDetails user
+    ) {
+        postService.create(content, media, user.getUsername());
+    }
+    
 
     /**
      * 🔹 Edit my post
