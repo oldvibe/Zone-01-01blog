@@ -1,10 +1,12 @@
 package com.blog01.backend.like;
 
+import com.blog01.backend.common.ApiException;
 import com.blog01.backend.post.Post;
 import com.blog01.backend.post.PostRepository;
 import com.blog01.backend.user.User;
 import com.blog01.backend.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,10 +23,10 @@ public class PostLikeService {
     public void toggleLike(Long postId, String username) {
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Post not found"));
 
         likeRepository.findByUserAndPost(user, post)
                 .ifPresentOrElse(
@@ -44,7 +46,7 @@ public class PostLikeService {
     public long countLikes(Long postId) {
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Post not found"));
 
         return likeRepository.countByPost(post);
     }

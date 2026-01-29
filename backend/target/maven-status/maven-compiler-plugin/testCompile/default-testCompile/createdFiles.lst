@@ -1,1 +1,3 @@
 com/blog01/backend/BackendApplicationTests.class
+com/blog01/backend/user/UserUpdateControllerTest.class
+com/blog01/backend/report/ReportControllerTest.class

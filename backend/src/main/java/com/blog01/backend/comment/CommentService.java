@@ -1,10 +1,12 @@
 package com.blog01.backend.comment;
 
+import com.blog01.backend.common.ApiException;
 import com.blog01.backend.post.Post;
 import com.blog01.backend.post.PostRepository;
 import com.blog01.backend.user.User;
 import com.blog01.backend.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -24,7 +26,7 @@ public class CommentService {
     public List<CommentResponse> getComments(Long postId, String username) {
 
         User currentUser = userRepository.findByUsername(username)
-                .orElseThrow();
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
         return commentRepository.findAllByPostId(postId)
                 .stream()
@@ -44,10 +46,10 @@ public class CommentService {
         public CommentResponse addComment(Long postId, String content, String username) {
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow();
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
         Post post = postRepository.findById(postId)
-                .orElseThrow();
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Post not found"));
 
         Comment comment = Comment.builder()
                 .content(content)
@@ -73,10 +75,10 @@ public class CommentService {
     public void deleteComment(Long commentId, String username) {
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow();
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow();
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Comment not found"));
 
         boolean isOwner = comment.getAuthor().getId().equals(user.getId());
         boolean isAdmin = user.getRole().name().equals("ROLE_ADMIN");

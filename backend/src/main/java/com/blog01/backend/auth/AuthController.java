@@ -15,12 +15,8 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public void register(@Valid @RequestBody RegisterRequest request) {
-        System.out.println("Register endpoint called");
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        authService.register(request);
+    public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
+        return authService.register(request);
     }
 
     @PostMapping("/login")

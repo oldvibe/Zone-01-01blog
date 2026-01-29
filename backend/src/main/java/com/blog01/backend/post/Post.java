@@ -20,6 +20,10 @@ public class Post {
 
     private String mediaUrl;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean visible = true;
+
     @ManyToOne
     private User author;
 

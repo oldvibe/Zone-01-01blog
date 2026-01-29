@@ -3,11 +3,13 @@ package com.blog01.backend.auth;
 import com.blog01.backend.auth.dto.AuthResponse;
 import com.blog01.backend.auth.dto.LoginRequest;
 import com.blog01.backend.auth.dto.RegisterRequest;
+import com.blog01.backend.common.ApiException;
 import com.blog01.backend.common.enums.Role;
 import com.blog01.backend.user.User;
 import com.blog01.backend.user.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,16 +21,16 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final com.blog01.backend.config.security.JwtService jwtService;
 
-    public void register(RegisterRequest request) {
+    public AuthResponse register(RegisterRequest request) {
 
         // ✅ check username
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username already taken");
+            throw new ApiException(HttpStatus.CONFLICT, "Username already taken");
         }
 
         // ✅ check email
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already in use");
+            throw new ApiException(HttpStatus.CONFLICT, "Email already in use");
         }
 
         User user = User.builder()
@@ -41,14 +43,17 @@ public class AuthService {
                 .build();
 
         userRepository.save(user);
+
+        String token = jwtService.generateToken(user.getUsername());
+        return new AuthResponse(token);
     }
 
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+                .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
 
         String token = jwtService.generateToken(user.getUsername());

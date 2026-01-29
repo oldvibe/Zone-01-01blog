@@ -23,6 +23,6 @@ public class FileController {
 
         Files.write(path, file.getBytes());
 
-        return filename;
+        return "/uploads/" + filename;
     }
 }

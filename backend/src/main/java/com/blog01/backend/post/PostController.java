@@ -20,12 +20,23 @@ public class PostController {
      * 🔹 Public feed (all posts)
      */
     @GetMapping
-    public Page<Post> getAll(
+    public Page<PostResponse> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal UserPrincipal user
     ) {
         return postService.getFeed(user, page, size);
+    }
+
+    /**
+     * 🔹 Get post by id
+     */
+    @GetMapping("/{id}")
+    public PostResponse getById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal user
+    ) {
+        return postService.getById(user, id);
     }
 
     /**

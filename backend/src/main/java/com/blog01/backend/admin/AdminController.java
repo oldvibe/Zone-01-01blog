@@ -49,7 +49,7 @@ public class AdminController {
 
     @DeleteMapping("/posts/{id}")
     public void deletePost(@PathVariable Long id) {
-        postService.delete(id, id);
+        postService.deleteByAdmin(id);
     }
 
     /* ================= USERS ================= */

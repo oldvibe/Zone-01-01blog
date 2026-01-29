@@ -1,8 +1,10 @@
 package com.blog01.backend.follow;
 
+import com.blog01.backend.common.ApiException;
 import com.blog01.backend.user.User;
 import com.blog01.backend.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,13 +22,13 @@ public class FollowService {
     public void toggleFollow(Long targetUserId, String currentUsername) {
 
         User currentUser = userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
         User targetUser = userRepository.findById(targetUserId)
-                .orElseThrow(() -> new RuntimeException("Target user not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Target user not found"));
 
         if (currentUser.getId().equals(targetUser.getId())) {
-            throw new RuntimeException("You cannot follow yourself");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "You cannot follow yourself");
         }
 
         followRepository.findByFollowerAndFollowing(currentUser, targetUser)
@@ -48,7 +50,7 @@ public class FollowService {
     public List<FollowUserResponse> getMyFollowing(String username) {
 
         User me = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
         return followRepository.findAllByFollower(me)
                 .stream()
@@ -65,7 +67,7 @@ public class FollowService {
     public List<FollowUserResponse> getMyFollowers(String username) {
 
         User me = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
         return followRepository.findAllByFollowing(me)
                 .stream()

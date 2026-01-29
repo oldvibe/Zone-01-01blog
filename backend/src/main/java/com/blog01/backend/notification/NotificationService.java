@@ -1,8 +1,10 @@
 package com.blog01.backend.notification;
 
+import com.blog01.backend.common.ApiException;
 import com.blog01.backend.user.User;
 import com.blog01.backend.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,7 +35,7 @@ public class NotificationService {
         public List<NotificationResponse> getMyNotifications(String username) {
 
                 User user = userRepository.findByUsername(username)
-                                .orElseThrow(() -> new RuntimeException("User not found"));
+                                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
                 return notificationRepository.findByUserOrderByCreatedAtDesc(user)
                                 .stream()
@@ -45,19 +47,25 @@ public class NotificationService {
                                 .toList();
         }
 
+        public long countUnread(String username) {
+                User user = userRepository.findByUsername(username)
+                                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+                return notificationRepository.countByUserAndReadFalse(user);
+        }
+
         /**
          * 🔹 Mark notification as read
          */
         public void markAsRead(Long notificationId, String username) {
 
                 User user = userRepository.findByUsername(username)
-                                .orElseThrow(() -> new RuntimeException("User not found"));
+                                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
                 Notification notification = notificationRepository.findById(notificationId)
-                                .orElseThrow(() -> new RuntimeException("Notification not found"));
+                                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Notification not found"));
 
                 if (!notification.getUser().getId().equals(user.getId())) {
-                        throw new RuntimeException("Not allowed");
+                        throw new ApiException(HttpStatus.FORBIDDEN, "Not allowed");
                 }
 
                 notification.setRead(true);

@@ -23,6 +23,11 @@ public class NotificationController {
         return notificationService.getMyNotifications(user.getUsername());
     }
 
+    @GetMapping("/unread-count")
+    public long unreadCount(@AuthenticationPrincipal UserDetails user) {
+        return notificationService.countUnread(user.getUsername());
+    }
+
     /**
      * 🔹 Mark notification as read
      */
