@@ -25,6 +25,7 @@ com/blog01/backend/comment/Comment.class
 com/blog01/backend/post/PostRepository.class
 com/blog01/backend/user/User.class
 com/blog01/backend/file/FileController.class
+com/blog01/backend/config/StaticResourceConfig.class
 com/blog01/backend/report/ReportService.class
 com/blog01/backend/user/UserController.class
 com/blog01/backend/comment/CommentService.class
