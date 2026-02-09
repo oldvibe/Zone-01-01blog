@@ -1,0 +1,128 @@
+.posts-shell {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 16px 80px;
+}
+
+.posts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.posts-nav {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.posts-switch {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.posts-switch .btn.is-active {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+}
+
+.posts-header__eyebrow {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-soft);
+  margin: 0 0 6px;
+}
+
+.posts-composer {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 28px;
+}
+
+.media-preview img,
+.media-preview video {
+  width: 100%;
+  border-radius: 14px;
+  margin-top: 8px;
+  max-height: 280px;
+  object-fit: cover;
+}
+
+.posts-list {
+  display: grid;
+  gap: 18px;
+}
+
+.post-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px 20px;
+  display: grid;
+  gap: 12px;
+}
+
+.post-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.post-card__author {
+  margin: 0 0 4px;
+  font-weight: 600;
+}
+
+.post-card__date {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.post-card__content {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.post-card img {
+  width: 100%;
+  border-radius: 14px;
+  object-fit: cover;
+  max-height: 360px;
+}
+
+.post-card__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.post-report {
+  display: grid;
+  gap: 10px;
+}
+
+.post-report textarea {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-family: inherit;
+  background: var(--surface-muted);
+}
+
+.posts-back {
+  display: inline-block;
+  margin-top: 24px;
+  color: var(--ink-soft);
+}

@@ -1,0 +1,107 @@
+<section class="profile-shell">
+  <header class="profile-header">
+    <div>
+      <p class="profile-header__eyebrow">Account</p>
+      <h1>{{ isMe ? 'Profile' : 'User profile' }}</h1>
+    </div>
+    <nav class="profile-nav">
+      <a routerLink="/posts" class="btn btn--ghost">Feed</a>
+      <a routerLink="/notifications" class="btn btn--ghost">Notifications</a>
+    </nav>
+  </header>
+
+  <p *ngIf="loading" class="helper">Loading profile...</p>
+  <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+
+  <div *ngIf="user" class="profile-card">
+    <div>
+      <h2>{{ user.username }}</h2>
+      <p class="helper">{{ user.email }}</p>
+    </div>
+    <div *ngIf="!isMe && canFollowViewedUser()" class="profile-actions">
+      <button class="btn btn--ghost" type="button" (click)="toggleFollow(user.id)">
+        {{ isFollowingViewedUser() ? 'Unfollow' : 'Follow' }}
+      </button>
+      <button class="btn btn--ghost" type="button" (click)="toggleReport()">
+        Report
+      </button>
+    </div>
+    <div class="profile-stats">
+      <div>
+        <span class="stat-number">{{ posts.length }}</span>
+        <span class="stat-label">Posts</span>
+      </div>
+      <div>
+        <span class="stat-number">{{ followers.length }}</span>
+        <span class="stat-label">Followers</span>
+      </div>
+      <div>
+        <span class="stat-number">{{ following.length }}</span>
+        <span class="stat-label">Following</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-grid" *ngIf="isMe">
+    <section class="profile-panel">
+      <h3>Followers</h3>
+      <p *ngIf="followersLoading" class="helper">Loading followers...</p>
+      <p *ngIf="!followersLoading && !followers.length" class="helper">No followers yet.</p>
+      <ul *ngIf="followers.length">
+        <li *ngFor="let user of followers">
+          <span>{{ user.username }}</span>
+          <button class="btn btn--ghost" type="button" (click)="toggleFollow(user.id)">
+            {{ isFollowingUser(user.id) ? 'Unfollow' : 'Follow back' }}
+          </button>
+        </li>
+      </ul>
+    </section>
+
+    <section class="profile-panel">
+      <h3>Following</h3>
+      <p *ngIf="followingLoading" class="helper">Loading following...</p>
+      <p *ngIf="!followingLoading && !following.length" class="helper">Not following anyone yet.</p>
+      <ul *ngIf="following.length">
+        <li *ngFor="let user of following">
+          <span>{{ user.username }}</span>
+          <button class="btn btn--ghost" type="button" (click)="toggleFollow(user.id)">
+            Unfollow
+          </button>
+        </li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="profile-posts">
+    <h3>{{ isMe ? 'My posts' : 'Posts' }}</h3>
+    <p *ngIf="postsLoading" class="helper">Loading posts...</p>
+    <div *ngIf="reporting" class="report-box">
+      <h4>Report this user</h4>
+      <form [formGroup]="reportForm" (ngSubmit)="submitReport()">
+        <textarea
+          rows="3"
+          placeholder="Tell us what's wrong..."
+          formControlName="reason"
+        ></textarea>
+        <button class="btn" type="submit">Submit report</button>
+        <p *ngIf="reportMessage" class="helper">{{ reportMessage }}</p>
+      </form>
+    </div>
+    <div *ngIf="posts.length" class="posts-list">
+      <article class="post-card" *ngFor="let post of posts">
+        <div class="post-card__content">{{ post.content }}</div>
+        <img *ngIf="post.mediaUrl" [src]="post.mediaUrl" alt="Post media" />
+        <div class="post-card__meta">
+          <span>{{ formatDate(post.createdAt || '') }}</span>
+          <div class="post-card__actions">
+            <a class="btn btn--ghost" [routerLink]="['/posts', post.id]">View</a>
+            <button class="btn btn--ghost" type="button" (click)="deletePost(post.id)">
+              Delete
+            </button>
+          </div>
+        </div>
+      </article>
+    </div>
+    <p *ngIf="!postsLoading && !posts.length" class="helper">No posts yet.</p>
+  </section>
+</section>

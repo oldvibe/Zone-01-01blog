@@ -1,0 +1,35 @@
+<section class="notifications-shell">
+  <header class="notifications-header">
+    <div>
+      <p class="notifications-header__eyebrow">Inbox</p>
+      <h1>Notifications</h1>
+    </div>
+    <nav class="notifications-nav">
+      <a routerLink="/posts" class="btn btn--ghost">Feed</a>
+      <a routerLink="/profile" class="btn btn--ghost">Profile</a>
+      <a routerLink="/explore" class="btn btn--ghost">Explore</a>
+    </nav>
+  </header>
+
+  <p *ngIf="loading" class="helper">Loading...</p>
+  <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+
+  <div class="notifications-list" *ngIf="items.length">
+    <article class="notification-card" *ngFor="let item of items">
+      <div>
+        <p class="notification-card__message">{{ item.message }}</p>
+        <span class="notification-card__time">{{ item.createdAt }}</span>
+      </div>
+      <button
+        class="btn btn--ghost"
+        type="button"
+        [disabled]="item.read"
+        (click)="markRead(item.id)"
+      >
+        {{ item.read ? 'Read' : 'Mark as read' }}
+      </button>
+    </article>
+  </div>
+
+  <p *ngIf="!loading && !items.length" class="helper">No notifications yet.</p>
+</section>

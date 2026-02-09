@@ -1,0 +1,25 @@
+<header class="app-header">
+  <div class="brand">
+    <span class="brand__dot"></span>
+    <span>01Blog</span>
+  </div>
+  <nav class="app-nav" *ngIf="isLoggedIn()">
+    <a routerLink="/posts" routerLinkActive="is-active">Feed</a>
+    <a routerLink="/explore" routerLinkActive="is-active">Explore</a>
+    <a routerLink="/notifications" routerLinkActive="is-active" class="nav-notifications">
+      Notifications
+      <span *ngIf="unreadCount > 0" class="badge">{{ unreadCount }}</span>
+    </a>
+    <a routerLink="/profile" routerLinkActive="is-active">Profile</a>
+    <a routerLink="/settings" routerLinkActive="is-active">Settings</a>
+    <a routerLink="/admin" routerLinkActive="is-active">Admin</a>
+  </nav>
+  <nav class="app-nav" *ngIf="!isLoggedIn()">
+    <a routerLink="/" routerLinkActive="is-active">Login</a>
+    <a routerLink="/register" routerLinkActive="is-active">Register</a>
+  </nav>
+</header>
+
+<main class="app-main">
+  <router-outlet />
+</main>

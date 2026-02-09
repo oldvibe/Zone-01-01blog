@@ -1,0 +1,55 @@
+<section class="explore-shell">
+  <header class="explore-header">
+    <div>
+      <p class="explore-header__eyebrow">Discover</p>
+      <h1>Explore</h1>
+      <p class="helper">Find creators and updates from across the community.</p>
+    </div>
+    <nav class="explore-nav">
+      <a routerLink="/posts" class="btn btn--ghost">Feed</a>
+      <a routerLink="/notifications" class="btn btn--ghost">Notifications</a>
+      <a routerLink="/profile" class="btn btn--ghost">Profile</a>
+    </nav>
+  </header>
+
+  <p *ngIf="loading" class="helper">Loading explore feed...</p>
+  <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+
+  <section class="explore-grid" *ngIf="authors.length">
+    <div class="explore-panel">
+      <h2>Featured creators</h2>
+      <div class="creator-list">
+        <div class="creator-card" *ngFor="let author of authors">
+          <div>
+            <strong>{{ author.username }}</strong>
+            <p class="helper">@{{ author.username }}</p>
+          </div>
+          <button
+            class="btn btn--ghost"
+            type="button"
+            (click)="toggleFollow(author.id)"
+          >
+            {{ isFollowing(author.id) ? 'Unfollow' : 'Follow' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="explore-panel">
+      <h2>Latest posts</h2>
+      <div class="posts-list">
+        <article class="post-card" *ngFor="let post of posts">
+          <div>
+            <p class="post-card__meta">
+              {{ post.authorUsername || 'Unknown' }} · {{ formatDate(post.createdAt) }}
+            </p>
+            <p class="post-card__content">{{ post.content }}</p>
+          </div>
+          <a class="btn btn--ghost" [routerLink]="['/posts', post.id]">View</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <p *ngIf="!loading && !posts.length" class="helper">No posts to explore yet.</p>
+</section>

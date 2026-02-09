@@ -1,0 +1,52 @@
+<section class="settings-shell">
+  <header class="settings-header">
+    <div>
+      <p class="settings-header__eyebrow">Preferences</p>
+      <h1>Settings</h1>
+    </div>
+    <nav class="settings-nav">
+      <a routerLink="/posts" class="btn btn--ghost">Feed</a>
+      <a routerLink="/profile" class="btn btn--ghost">Profile</a>
+      <a routerLink="/notifications" class="btn btn--ghost">Notifications</a>
+    </nav>
+  </header>
+
+  <p *ngIf="loading" class="helper">Loading settings...</p>
+  <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+
+  <section class="settings-card">
+    <div>
+      <h2>Account</h2>
+      <p class="helper">Manage your profile overview.</p>
+    </div>
+    <form class="settings-form" [formGroup]="form" (ngSubmit)="saveProfile()">
+      <label>
+        <span class="label">Username</span>
+        <input type="text" formControlName="username" />
+      </label>
+      <label>
+        <span class="label">Email</span>
+        <input type="email" formControlName="email" />
+      </label>
+      <button class="btn" type="submit">Save</button>
+    </form>
+  </section>
+
+  <section class="settings-card">
+    <div>
+      <h2>Display</h2>
+      <p class="helper">Choose how dense your dashboard feels.</p>
+    </div>
+    <button class="btn btn--ghost" type="button" (click)="toggleCompactMode()">
+      {{ compactMode ? 'Disable' : 'Enable' }} compact mode
+    </button>
+  </section>
+
+  <section class="settings-card">
+    <div>
+      <h2>Session</h2>
+      <p class="helper">Sign out of your account.</p>
+    </div>
+    <button class="btn" type="button" (click)="logout()">Logout</button>
+  </section>
+</section>

@@ -1,0 +1,191 @@
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fonts/space-grotesk-400.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/assets/fonts/space-grotesk-500.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/assets/fonts/space-grotesk-600.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/assets/fonts/space-grotesk-700.ttf") format("truetype");
+}
+
+:root {
+  --bg-1: #f4f6fb;
+  --bg-2: #eef4ff;
+  --ink: #141522;
+  --ink-soft: #5b6175;
+  --accent: #2b5bff;
+  --accent-2: #f5c74e;
+  --surface: #ffffff;
+  --surface-muted: #f6f6f6;
+  --border: #e2e2e2;
+  --shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+  /* design tokens for login page */
+  --primary: #EF4444;
+  --primary-2: #F97316;
+  --background-light: #F8FAFC;
+  --background-dark: #0F172A;
+  --panel-dark: #0B1220;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Space Grotesk", "Trebuchet MS", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #fff 0%, transparent 60%),
+    radial-gradient(800px 500px at 90% 0%, #fff 0%, transparent 55%),
+    linear-gradient(120deg, var(--bg-1), var(--bg-2));
+  min-height: 100vh;
+}
+
+/* Dark theme (applies when <html> has class="dark") */
+html.dark body {
+  color: #e6eef8;
+  background: linear-gradient(90deg, rgba(6,10,18,1) 0%, rgba(15,23,42,1) 100%);
+}
+
+/* helpers used by the login template */
+.bg-panel-dark {
+  background: linear-gradient(180deg, rgba(11,18,32,0.9), rgba(11,18,32,0.75));
+}
+
+.text-primary { color: var(--primary); }
+.gradient-button { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%); }
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.page-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 16px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  padding: 28px;
+  width: min(480px, 100%);
+}
+
+.card__title {
+  font-size: 32px;
+  margin: 0 0 8px;
+}
+
+.card__subtitle {
+  margin: 0 0 24px;
+  color: var(--ink-soft);
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.field label {
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-family: inherit;
+  background: var(--surface-muted);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn--ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--ink);
+}
+
+.btn.btn--ghost {
+  background: transparent;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.helper {
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.error {
+  color: #b3261e;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+body.compact .posts-shell,
+body.compact .profile-shell,
+body.compact .notifications-shell,
+body.compact .detail-shell,
+body.compact .explore-shell,
+body.compact .admin-shell,
+body.compact .settings-shell {
+  padding-top: 24px;
+}
+
+

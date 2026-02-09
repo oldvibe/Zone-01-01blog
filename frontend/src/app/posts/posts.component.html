@@ -1,0 +1,81 @@
+<section class="posts-shell">
+  <header class="posts-header">
+    <div>
+      <p class="posts-header__eyebrow">Your space</p>
+      <h1>Feed</h1>
+    </div>
+    <nav class="posts-nav">
+      <a routerLink="/profile" class="btn btn--ghost">Profile</a>
+      <a routerLink="/notifications" class="btn btn--ghost">Notifications</a>
+      <button class="btn btn--ghost" type="button" (click)="logout()">Logout</button>
+    </nav>
+  </header>
+
+  <div class="posts-switch">
+    <button type="button" class="btn btn--ghost" [class.is-active]="feedMode === 'public'" (click)="setMode('public')">
+      Public feed
+    </button>
+    <button type="button" class="btn btn--ghost" [class.is-active]="feedMode === 'subscriptions'"
+      (click)="setMode('subscriptions')">
+      Following
+    </button>
+  </div>
+
+  <form class="posts-composer" [formGroup]="form" (ngSubmit)="createPost()">
+    <div class="field">
+      <label for="content">Share an update</label>
+      <textarea id="content" rows="3" placeholder="What's on your mind?" formControlName="content"></textarea>
+    </div>
+    <div class="field">
+      <label for="mediaUrl">Media URL (optional)</label>
+      <input id="mediaUrl" type="text" placeholder="https://..." formControlName="mediaUrl" />
+    </div>
+    <div class="field">
+      <label for="mediaFile">Upload media (optional)</label>
+      <input id="mediaFile" type="file" (change)="onFileSelected($event)" />
+      <div *ngIf="mediaPreview" class="media-preview">
+        <video *ngIf="mediaPreviewIsVideo" [src]="mediaPreview" muted controls></video>
+        <img *ngIf="!mediaPreviewIsVideo" [src]="mediaPreview" alt="Media preview" />
+      </div>
+    </div>
+    <button class="btn" type="submit">Post</button>
+  </form>
+
+  <p *ngIf="loading" class="helper">Loading...</p>
+  <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+
+  <div class="posts-list" *ngIf="posts.length">
+    <article class="post-card" *ngFor="let post of posts">
+      <header class="post-card__header">
+        <div>
+          <p class="post-card__author">{{ post.authorUsername || 'unknown' }}</p>
+          <p class="post-card__date">{{ formatDate(post.createdAt || post.created_at || '') }}</p>
+        </div>
+        <button class="btn btn--ghost" type="button" *ngIf="!post.mine" (click)="toggleFollow(post)">
+          {{ isFollowing(post) ? 'Unfollow' : 'Follow' }}
+        </button>
+      </header>
+      <div class="post-card__content">{{ post.content }}</div>
+      <img *ngIf="post.mediaUrl" [src]="'http://localhost:8080'+post.mediaUrl" alt="Post media" />
+      <div class="post-card__meta">
+        <button class="btn btn--ghost" type="button" (click)="toggleLike(post)">
+          {{ post.likedByMe ? 'Liked' : 'Like' }} · {{ post.likes || 0 }}
+        </button>
+        <button class="btn btn--ghost" type="button" (click)="openReport(post)">
+          Report
+        </button>
+        <a class="btn btn--ghost" [routerLink]="['/posts', post.id]">Comments</a>
+      </div>
+      <form *ngIf="reportingPostId === post.id" class="post-report" [formGroup]="reportForm"
+        (ngSubmit)="submitReport(post)">
+        <textarea rows="2" placeholder="Why are you reporting this post?" formControlName="reason"></textarea>
+        <button class="btn" type="submit">Submit report</button>
+        <p *ngIf="reportMessage" class="helper">{{ reportMessage }}</p>
+      </form>
+    </article>
+  </div>
+
+  <p *ngIf="!loading && !posts.length" class="helper">No posts yet.</p>
+
+  <a class="posts-back" routerLink="/">Back to login</a>
+</section>

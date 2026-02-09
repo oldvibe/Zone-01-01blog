@@ -1,0 +1,64 @@
+<p *ngIf="loading" class="helper">Loading admin data...</p>
+<p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+
+<div class="admin-grid">
+  <section class="admin-panel">
+    <h2>Users</h2>
+    <p *ngIf="!users.length" class="helper">No users found.</p>
+    <div class="admin-list" *ngIf="users.length">
+      <article class="admin-card" *ngFor="let user of users">
+        <div>
+          <strong>{{ user.username }}</strong>
+          <p class="helper">{{ user.email }}</p>
+          <p class="helper">Role: {{ user.role }}</p>
+        </div>
+        <div class="admin-actions">
+          <button class="btn btn--ghost" type="button" (click)="banUser(user.id)">
+            {{ user.enabled ? 'Ban' : 'Banned' }}
+          </button>
+          <button class="btn btn--ghost" type="button" (click)="deleteUser(user.id)">
+            Delete
+          </button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="admin-panel">
+    <h2>Posts</h2>
+    <p *ngIf="!posts.length" class="helper">No posts found.</p>
+    <div class="admin-list" *ngIf="posts.length">
+      <article class="admin-card" *ngFor="let post of posts">
+        <div>
+          <strong>{{ post.authorUsername }}</strong>
+          <p class="helper">{{ formatDate(post.createdAt) }}</p>
+          <p>{{ post.content }}</p>
+        </div>
+        <div class="admin-actions">
+          <button class="btn btn--ghost" type="button" (click)="hidePost(post.id)">Hide</button>
+          <button class="btn btn--ghost" type="button" (click)="deletePost(post.id)">Delete</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="admin-panel">
+    <h2>Reports</h2>
+    <p *ngIf="!reports.length" class="helper">No pending reports.</p>
+    <div class="admin-list" *ngIf="reports.length">
+      <article class="admin-card" *ngFor="let report of reports">
+        <div>
+          <strong>{{ report.targetType }} #{{ report.targetId }}</strong>
+          <p class="helper">{{ report.reason }}</p>
+          <p class="helper">By {{ report.reporterUsername }}</p>
+        </div>
+        <div class="admin-actions">
+          <button class="btn btn--ghost" type="button" (click)="resolveReport(report.id)">
+            {{ report.resolved ? 'Resolved' : 'Resolve' }}
+          </button>
+          <button class="btn btn--ghost" type="button" (click)="deleteReport(report.id)">Delete</button>
+        </div>
+      </article>
+    </div>
+  </section>
+</div>

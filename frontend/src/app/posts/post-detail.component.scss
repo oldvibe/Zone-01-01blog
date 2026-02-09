@@ -1,0 +1,126 @@
+.detail-shell {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 40px 16px 80px;
+  display: grid;
+  gap: 24px;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.detail-header__eyebrow {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--ink-soft);
+  margin: 0 0 6px;
+}
+
+.detail-nav {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.post-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 22px;
+  display: grid;
+  gap: 16px;
+  box-shadow: var(--shadow);
+}
+
+.post-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.post-card__title {
+  margin: 0;
+  font-size: 20px;
+}
+
+.post-card__meta {
+  margin: 4px 0 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.post-card__content {
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.post-card img {
+  width: 100%;
+  border-radius: 16px;
+  max-height: 420px;
+  object-fit: cover;
+}
+
+.post-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.comment-box,
+.comments-list,
+.report-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.comment-box form,
+.report-box form {
+  display: grid;
+  gap: 12px;
+}
+
+.comment-box textarea,
+.report-box textarea {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-family: inherit;
+  background: var(--surface-muted);
+}
+
+.comments-list {
+  display: grid;
+  gap: 12px;
+}
+
+.comment-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  background: var(--surface-muted);
+}
+
+.comment-card p {
+  margin: 6px 0;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}

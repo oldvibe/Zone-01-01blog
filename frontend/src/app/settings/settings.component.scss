@@ -1,0 +1,70 @@
+.settings-shell {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 16px 80px;
+  display: grid;
+  gap: 20px;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.settings-header__eyebrow {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--ink-soft);
+  margin: 0 0 6px;
+}
+
+.settings-nav {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.settings-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.settings-form {
+  display: grid;
+  gap: 12px;
+  min-width: min(360px, 100%);
+}
+
+.settings-form input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--surface-muted);
+  font-family: inherit;
+}
+
+.settings-info {
+  display: grid;
+  gap: 10px;
+}
+
+.label {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-soft);
+}

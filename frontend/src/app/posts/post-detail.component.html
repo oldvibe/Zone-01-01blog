@@ -1,0 +1,103 @@
+<section class="detail-shell">
+  <header class="detail-header">
+    <div>
+      <p class="detail-header__eyebrow">Post</p>
+      <h1>Post detail</h1>
+    </div>
+    <nav class="detail-nav">
+      <a routerLink="/posts" class="btn btn--ghost">Feed</a>
+      <a routerLink="/explore" class="btn btn--ghost">Explore</a>
+      <a routerLink="/notifications" class="btn btn--ghost">Notifications</a>
+    </nav>
+  </header>
+
+  <p *ngIf="loading" class="helper">Loading post...</p>
+  <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+
+  <article *ngIf="post" class="post-card">
+    <header class="post-card__header">
+      <div>
+        <h2 class="post-card__title">{{ post.authorUsername || 'Unknown' }}</h2>
+        <p class="post-card__meta">{{ formatDate(post.createdAt) }}</p>
+      </div>
+      <button
+        class="btn btn--ghost"
+        type="button"
+        *ngIf="!post.mine"
+        (click)="toggleFollow()"
+      >
+        {{ isFollowingAuthor() ? 'Unfollow' : 'Follow' }}
+      </button>
+    </header>
+
+    <p class="post-card__content">{{ post.content }}</p>
+    <img *ngIf="post.mediaUrl" [src]="post.mediaUrl" alt="Post media" />
+
+    <div class="post-card__actions">
+      <button class="btn btn--ghost" type="button" (click)="toggleLike()">
+        {{ post.likedByMe ? 'Liked' : 'Like' }} · {{ post.likes || 0 }}
+      </button>
+      <button class="btn btn--ghost" type="button" (click)="toggleReport()">
+        Report
+      </button>
+      <span class="helper">{{ comments.length }} comments</span>
+    </div>
+  </article>
+
+  <section *ngIf="post && reporting" class="report-box">
+    <h3>Report this post</h3>
+    <form [formGroup]="reportForm" (ngSubmit)="submitReport()">
+      <textarea
+        rows="3"
+        placeholder="Tell us what's wrong..."
+        formControlName="reason"
+      ></textarea>
+      <button class="btn" type="submit">Submit report</button>
+      <p *ngIf="reportMessage" class="helper">{{ reportMessage }}</p>
+    </form>
+  </section>
+
+  <section *ngIf="post" class="comment-box">
+    <h3>Add a comment</h3>
+    <form [formGroup]="form" (ngSubmit)="addComment()">
+      <textarea
+        rows="3"
+        placeholder="Write a comment..."
+        formControlName="content"
+      ></textarea>
+      <button class="btn" type="submit">Send</button>
+    </form>
+  </section>
+
+  <section *ngIf="post" class="comments-list">
+    <h3>Comments</h3>
+    <p *ngIf="commentsLoading" class="helper">Loading comments...</p>
+    <p *ngIf="commentReportMessage" class="helper">{{ commentReportMessage }}</p>
+    <p *ngIf="!commentsLoading && !comments.length" class="helper">No comments yet.</p>
+    <article class="comment-card" *ngFor="let comment of comments">
+      <div>
+        <strong>{{ comment.author }}</strong>
+        <p>{{ comment.content }}</p>
+        <span class="helper">{{ formatDate(comment.createdAt) }}</span>
+      </div>
+      <div class="comment-actions">
+        <button
+          class="btn btn--ghost"
+          type="button"
+          *ngIf="!comment.owner"
+          (click)="reportComment(comment)"
+        >
+          Report
+        </button>
+        <button
+          class="btn btn--ghost"
+          type="button"
+          *ngIf="comment.owner"
+          (click)="deleteComment(comment.id)"
+        >
+          Delete
+        </button>
+      </div>
+    </article>
+  </section>
+</section>
