@@ -41,8 +41,7 @@ export class PostsComponent implements OnInit, OnDestroy {
     private chdr: ChangeDetectorRef,
   ) {
     this.form = this.fb.group({
-      content: ['', Validators.required],
-      mediaUrl: ['']
+      content: ['', Validators.required]
     });
     this.reportForm = this.fb.group({
       reason: ['', Validators.required]
@@ -117,8 +116,8 @@ export class PostsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const { content, mediaUrl } = this.form.value;
-    const mediaUrls: string[] = mediaUrl ? [mediaUrl] : [];
+    const { content } = this.form.value;
+    const mediaUrls: string[] = [];
 
     const submit = () => {
       this.postService.create(content, mediaUrls).subscribe({

@@ -60,16 +60,11 @@
               <i class="bi bi-image text-primary me-2"></i>Media
               <input id="mediaFile" type="file" multiple (change)="onFileSelected($event)" class="d-none" />
             </label>
-            <button type="button" class="btn btn-sm btn--ghost" (click)="mediaUrlInput.focus()">
-              <i class="bi bi-link-45deg text-primary"></i>
-            </button>
           </div>
           <button class="btn btn-primary px-4" type="submit" [disabled]="form.invalid || loading">
             Post
           </button>
         </div>
-        
-        <input #mediaUrlInput id="mediaUrl" type="text" class="form-control form-control-sm mt-3" placeholder="Paste media URL here..." formControlName="mediaUrl" />
       </form>
 
       <p *ngIf="loading" class="text-center py-5 text-muted">
