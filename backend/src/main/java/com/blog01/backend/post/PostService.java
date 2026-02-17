@@ -35,7 +35,8 @@ public class PostService {
         User currentUser = userRepository.findById(user.getId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
-        return postRepository.findAllByVisibleTrueOrderByCreatedAtDesc(
+        return postRepository.findAllByAuthorNotAndVisibleTrueOrderByCreatedAtDesc(
+                        currentUser,
                         PageRequest.of(page, size))
                 .map(post -> postMapper.toDto(post, currentUser));
     }

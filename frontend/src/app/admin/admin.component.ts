@@ -10,5 +10,4 @@ import { RouterOutlet, RouterLink } from '@angular/router';
   styleUrls: ['./admin.component.scss']
 })
 export class AdminComponent {
-  // Shell component for admin area. Child routes (dashboard, etc.) render in the outlet.
 }

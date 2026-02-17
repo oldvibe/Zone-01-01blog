@@ -19,5 +19,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             Pageable pageable
     );
 
+    Page<Post> findAllByAuthorNotAndVisibleTrueOrderByCreatedAtDesc(
+            User author,
+            Pageable pageable
+    );
+
     Page<Post> findAllByAuthorIdOrderByCreatedAtDesc(Long authorId, Pageable pageable);
 }

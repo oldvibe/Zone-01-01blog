@@ -91,6 +91,7 @@ export class PostsComponent implements OnInit, OnDestroy {
         this.errorMessage = 'Failed to load posts. Please login first.';
         this.loading = false;
         console.error(err);
+        this.chdr.markForCheck();
       }
     });
   }
@@ -131,10 +132,12 @@ export class PostsComponent implements OnInit, OnDestroy {
           } else {
             this.loadFeed();
           }
+          this.chdr.markForCheck();
         },
         error: (err) => {
           this.errorMessage = 'Failed to create post.';
           console.error(err);
+          this.chdr.markForCheck();
         }
       });
     };
@@ -149,10 +152,12 @@ export class PostsComponent implements OnInit, OnDestroy {
             if (uploadedCount === this.selectedFiles.length) {
               submit();
             }
+            this.chdr.markForCheck();
           },
           error: (err) => {
             this.errorMessage = 'Failed to upload media.';
             console.error(err);
+            this.chdr.markForCheck();
           }
         });
       });
@@ -204,10 +209,12 @@ export class PostsComponent implements OnInit, OnDestroy {
           this.reportMessage = 'Report submitted. Thank you.';
           this.reportingPostId = null;
           this.reportForm.reset();
+          this.chdr.markForCheck();
         },
         error: (err) => {
           console.error(err);
           this.reportMessage = 'Failed to submit report.';
+          this.chdr.markForCheck();
         }
       });
   }
@@ -217,6 +224,7 @@ export class PostsComponent implements OnInit, OnDestroy {
       this.postService.delete(id).subscribe({
         next: () => {
           this.posts = this.posts.filter(p => p.id !== id);
+          this.chdr.markForCheck();
         },
         error: (err) => console.error(err)
       });
@@ -274,3 +282,5 @@ export class PostsComponent implements OnInit, OnDestroy {
     }
   }
 }
+
+

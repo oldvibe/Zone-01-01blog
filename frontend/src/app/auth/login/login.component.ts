@@ -24,6 +24,9 @@ export class LoginComponent {
     private authService: AuthService,
     private router: Router
   ) {
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/posts']);
+    }
     // form initialization
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -43,15 +46,10 @@ export class LoginComponent {
     this.submitting = true;
     const { email, password, remember } = this.form.value;
     
-    this.authService.login({ email, password })
+    this.authService.login({ email, password }, remember)
       .subscribe({
-        next: (res) => {
+        next: () => {
           this.submitting = false;
-          if (remember) {
-            localStorage.setItem('token', res.token);
-          } else {
-            sessionStorage.setItem('token', res.token);
-          }
           this.router.navigate(['/posts']);
         },
         error: (err) => {

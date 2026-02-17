@@ -138,10 +138,12 @@ export class PostDetailComponent implements OnInit {
           comment,
           ...this.comments.filter((item) => item.id !== optimistic.id)
         ];
+        this.change.markForCheck();
       },
       error: (err) => {
         console.error(err);
         this.comments = this.comments.filter((item) => item.id !== optimistic.id);
+        this.change.markForCheck();
       }
     });
   }
@@ -164,10 +166,12 @@ export class PostDetailComponent implements OnInit {
           this.reportMessage = 'Report submitted. Thank you.';
           this.reportForm.reset();
           this.reporting = false;
+          this.change.markForCheck();
         },
         error: (err) => {
           console.error(err);
           this.reportMessage = 'Failed to submit report.';
+          this.change.markForCheck();
         }
       });
   }
@@ -181,10 +185,12 @@ export class PostDetailComponent implements OnInit {
       .subscribe({
         next: () => {
           this.commentReportMessage = 'Comment reported. Thank you.';
+          this.change.markForCheck();
         },
         error: (err) => {
           console.error(err);
           this.commentReportMessage = 'Failed to report comment.';
+          this.change.markForCheck();
         }
       });
   }
@@ -265,3 +271,5 @@ export class PostDetailComponent implements OnInit {
     return extensions.some(ext => url.toLowerCase().endsWith(ext));
   }
 }
+
+

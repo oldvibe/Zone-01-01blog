@@ -1,6 +1,7 @@
 package com.blog01.backend.follow;
 
 import com.blog01.backend.common.ApiException;
+import com.blog01.backend.notification.NotificationService;
 import com.blog01.backend.user.User;
 import com.blog01.backend.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ public class FollowService {
 
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     /**
      * 🔹 Follow / Unfollow (toggle)
@@ -40,6 +42,12 @@ public class FollowService {
                                     .following(targetUser)
                                     .build();
                             followRepository.save(follow);
+                            
+                            // Send notification
+                            notificationService.notifyUser(
+                                targetUser,
+                                currentUser.getUsername() + " started following you"
+                            );
                         }
                 );
     }

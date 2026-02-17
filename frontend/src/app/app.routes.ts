@@ -11,8 +11,6 @@ import { AdminDashboardComponent } from './admin/dashboard.component';
 import { SettingsComponent } from './settings/settings.component';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
-import { MessagesComponent } from './messages/messages.component';
-import { ChatComponent } from './messages/chat.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -23,14 +21,6 @@ export const routes: Routes = [
     { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
     { path: 'profile/:username', component: ProfileComponent, canActivate: [authGuard] },
     { path: 'notifications', component: NotificationsComponent, canActivate: [authGuard] },
-    {
-        path: 'messages',
-        component: MessagesComponent,
-        canActivate: [authGuard],
-        children: [
-            { path: ':id', component: ChatComponent }
-        ]
-    },
     {
         path: 'admin',
         component: AdminComponent,

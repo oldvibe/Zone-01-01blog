@@ -37,7 +37,7 @@
                 <small class="text-muted">&#64;{{ author.username }}</small>
               </div>
             </div>
-            <button class="btn btn-sm" [class.btn-primary]="!isFollowing(author.id)" [class.btn-outline-primary]="isFollowing(author.id)" (click)="toggleFollow(author.id)">
+            <button *ngIf="currentUser && author.id !== currentUser.id" class="btn btn-sm" [class.btn-primary]="!isFollowing(author.id)" [class.btn-outline-primary]="isFollowing(author.id)" (click)="toggleFollow(author.id)">
               {{ isFollowing(author.id) ? 'Unfollow' : 'Follow' }}
             </button>
           </div>

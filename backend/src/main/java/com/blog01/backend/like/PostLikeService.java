@@ -1,6 +1,7 @@
 package com.blog01.backend.like;
 
 import com.blog01.backend.common.ApiException;
+import com.blog01.backend.notification.NotificationService;
 import com.blog01.backend.post.Post;
 import com.blog01.backend.post.PostRepository;
 import com.blog01.backend.user.User;
@@ -16,6 +17,7 @@ public class PostLikeService {
     private final PostLikeRepository likeRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     /**
      * 🔹 Like / Unlike post (toggle)
@@ -31,12 +33,22 @@ public class PostLikeService {
         likeRepository.findByUserAndPost(user, post)
                 .ifPresentOrElse(
                         likeRepository::delete,
-                        () -> likeRepository.save(
+                        () -> {
+                            likeRepository.save(
                                 PostLike.builder()
                                         .user(user)
                                         .post(post)
                                         .build()
-                        )
+                            );
+                            
+                            // Send notification if not liking own post
+                            if (!post.getAuthor().getId().equals(user.getId())) {
+                                notificationService.notifyUser(
+                                    post.getAuthor(),
+                                    user.getUsername() + " liked your post"
+                                );
+                            }
+                        }
                 );
     }
 

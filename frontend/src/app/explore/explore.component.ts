@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PostService } from '../posts/post.service';
 import { FollowService } from '../core/services/follow.service';
+import { UserProfile, UserService } from '../core/services/user.service';
 
 @Component({
   selector: 'app-explore',
@@ -15,18 +16,34 @@ export class ExploreComponent implements OnInit {
   posts: any[] = [];
   authors: { id: number; username: string }[] = [];
   followingIds = new Set<number>();
+  currentUser?: UserProfile;
   loading = false;
   errorMessage = '';
 
   constructor(
     private postService: PostService,
     private followService: FollowService,
+    private userService: UserService,
     private change: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
+    this.loadCurrentUser();
     this.loadFollowing();
     this.loadPosts();
+  }
+
+  loadCurrentUser() {
+    this.userService.me().subscribe({
+      next: (user) => {
+        this.currentUser = user;
+        this.change.markForCheck();
+      },
+      error: (err) => {
+        console.error(err);
+        this.change.markForCheck();
+      }
+    });
   }
 
   loadFollowing() {
@@ -35,13 +52,17 @@ export class ExploreComponent implements OnInit {
         this.followingIds = new Set((res ?? []).map((user) => user.id));
         this.change.markForCheck();
       },
-      error: (err) => console.error(err)
+      error: (err) => {
+        console.error(err);
+        this.change.markForCheck();
+      }
     });
   }
 
   loadPosts(page = 0) {
     this.loading = true;
     this.errorMessage = '';
+    this.change.markForCheck();
     this.postService.getFeed(page).subscribe({
       next: (res) => {
         this.posts = Array.isArray(res?.content) ? res.content : (res ?? []);
@@ -53,6 +74,7 @@ export class ExploreComponent implements OnInit {
         console.error(err);
         this.loading = false;
         this.errorMessage = 'Failed to load explore feed.';
+        this.change.markForCheck();
       }
     });
   }
@@ -61,6 +83,10 @@ export class ExploreComponent implements OnInit {
     const map = new Map<number, string>();
     posts.forEach((post) => {
       if (post?.authorId && post?.authorUsername) {
+        // Filter out current user from authors list
+        if (this.currentUser && post.authorId === this.currentUser.id) {
+          return;
+        }
         map.set(post.authorId, post.authorUsername);
       }
     });

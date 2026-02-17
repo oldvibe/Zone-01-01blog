@@ -59,6 +59,7 @@ export class AdminDashboardComponent implements OnInit {
     this.adminService.banUser(id).subscribe({
       next: () => {
         this.users = this.users.map((u) => (u.id === id ? { ...u, enabled: false } : u));
+        this.change.markForCheck();
       },
       error: (err) => console.error(err)
     });

@@ -162,6 +162,9 @@ export class ProfileComponent implements OnInit {
   }
 
   toggleFollow(userId: number) {
+    if (this.viewer && userId === this.viewer.id) {
+      return;
+    }
     const isFollowing = this.following.some((user) => user.id === userId);
     if (isFollowing) {
       this.following = this.following.filter((user) => user.id !== userId);

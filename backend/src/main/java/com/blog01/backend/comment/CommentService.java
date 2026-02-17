@@ -1,6 +1,7 @@
 package com.blog01.backend.comment;
 
 import com.blog01.backend.common.ApiException;
+import com.blog01.backend.notification.NotificationService;
 import com.blog01.backend.post.Post;
 import com.blog01.backend.post.PostRepository;
 import com.blog01.backend.user.User;
@@ -19,12 +20,13 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     /**
      * 🔹 Get comments of post
      */
     public List<CommentResponse> getComments(Long postId, String username) {
-
+// ... (rest of the method remains same)
         User currentUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
@@ -44,7 +46,7 @@ public class CommentService {
     /**
      * 🔹 Add comment
      */
-        public CommentResponse addComment(Long postId, String content, Long parentId, String username) {
+    public CommentResponse addComment(Long postId, String content, Long parentId, String username) {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
@@ -67,6 +69,22 @@ public class CommentService {
                 .build();
 
         commentRepository.save(comment);
+
+        // Notify post author
+        if (!post.getAuthor().getId().equals(user.getId())) {
+            notificationService.notifyUser(
+                post.getAuthor(),
+                user.getUsername() + " commented on your post"
+            );
+        }
+
+        // Notify parent comment author if it's a reply
+        if (parent != null && !parent.getAuthor().getId().equals(user.getId()) && !parent.getAuthor().getId().equals(post.getAuthor().getId())) {
+            notificationService.notifyUser(
+                parent.getAuthor(),
+                user.getUsername() + " replied to your comment"
+            );
+        }
 
         return new CommentResponse(
                 comment.getId(),
