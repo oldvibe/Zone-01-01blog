@@ -4,13 +4,52 @@ services:
       context: ./backend
     ports:
       - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_URL=jdbc:postgresql://db:5432/mydb
+      - DB_DRIVER=org.postgresql.Driver
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+    networks:
+      - blog-net
 
   frontend:
     build:
       context: ./frontend
     ports:
-      - "4200:80"
+      - "4200:4200"
     depends_on:
       - backend
+    environment:
+      - BACKEND_URL=http://backend:8080
+    networks:
+      - blog-net
 
+  db:
+    image: postgres:16
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d mydb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - blog-net
 
+networks:
+  blog-net:
+    driver: bridge
+
+volumes:
+  postgres_data:

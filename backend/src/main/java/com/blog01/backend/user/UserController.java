@@ -32,7 +32,7 @@ public class UserController {
     public Page<PostResponse> postsByUsername(
             @PathVariable String username,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "20") int size
     ) {
         return postService.getPostsByUsername(username, page, size);
     }
@@ -49,7 +49,7 @@ public class UserController {
     public Page<PostResponse> myPosts(
             @AuthenticationPrincipal UserPrincipal user,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "20") int size
     ) {
         return postService.getPostsByAuthor(user.getId(), page, size);
     }

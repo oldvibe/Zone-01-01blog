@@ -247,4 +247,9 @@ export class ProfileComponent implements OnInit {
     const parsed = new Date(value);
     return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
   }
+
+  isVideo(url: string): boolean {
+    const extensions = ['.mp4', '.webm', '.ogg', '.mov'];
+    return extensions.some(ext => url.toLowerCase().endsWith(ext));
+  }
 }

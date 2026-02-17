@@ -69,3 +69,4 @@ export class Register {
   togglePassword() { this.showPassword = !this.showPassword; }
   toggleConfirm() { this.showConfirm = !this.showConfirm; }
 }
+

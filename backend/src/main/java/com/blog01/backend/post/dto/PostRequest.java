@@ -2,6 +2,7 @@ package com.blog01.backend.post.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 
 public record PostRequest(
 
@@ -10,5 +11,5 @@ public record PostRequest(
         String content,
 
         // optional (image / video url)
-        String mediaUrl
+        List<String> mediaUrls
 ) {}

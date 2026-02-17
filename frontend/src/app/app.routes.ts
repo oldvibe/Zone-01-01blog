@@ -9,23 +9,37 @@ import { ExploreComponent } from './explore/explore.component';
 import { AdminComponent } from './admin/admin.component';
 import { AdminDashboardComponent } from './admin/dashboard.component';
 import { SettingsComponent } from './settings/settings.component';
+import { authGuard } from './core/guards/auth.guard';
+import { adminGuard } from './core/guards/admin.guard';
+import { MessagesComponent } from './messages/messages.component';
+import { ChatComponent } from './messages/chat.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'register', component: Register },
-    { path: 'posts', component: PostsComponent },
-    { path: 'posts/:id', component: PostDetailComponent },
-    { path: 'explore', component: ExploreComponent },
-    { path: 'profile', component: ProfileComponent },
-    { path: 'profile/:username', component: ProfileComponent },
-    { path: 'notifications', component: NotificationsComponent },
+    { path: 'posts', component: PostsComponent, canActivate: [authGuard] },
+    { path: 'posts/:id', component: PostDetailComponent, canActivate: [authGuard] },
+    { path: 'explore', component: ExploreComponent, canActivate: [authGuard] },
+    { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
+    { path: 'profile/:username', component: ProfileComponent, canActivate: [authGuard] },
+    { path: 'notifications', component: NotificationsComponent, canActivate: [authGuard] },
+    {
+        path: 'messages',
+        component: MessagesComponent,
+        canActivate: [authGuard],
+        children: [
+            { path: ':id', component: ChatComponent }
+        ]
+    },
     {
         path: 'admin',
         component: AdminComponent,
+        canActivate: [authGuard, adminGuard],
         children: [
             { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
             { path: 'dashboard', component: AdminDashboardComponent }
         ]
     },
-    { path: 'settings', component: SettingsComponent }
+    { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
+    { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];

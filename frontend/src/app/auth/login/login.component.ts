@@ -27,7 +27,8 @@ export class LoginComponent {
     // form initialization
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required]
+      password: ['', Validators.required],
+      remember: [true]
     });
   }
 
@@ -40,11 +41,17 @@ export class LoginComponent {
 
     this.errorMessage = '';
     this.submitting = true;
-    this.authService.login(this.form.value)
+    const { email, password, remember } = this.form.value;
+    
+    this.authService.login({ email, password })
       .subscribe({
         next: (res) => {
           this.submitting = false;
-          localStorage.setItem('token', res.token);
+          if (remember) {
+            localStorage.setItem('token', res.token);
+          } else {
+            sessionStorage.setItem('token', res.token);
+          }
           this.router.navigate(['/posts']);
         },
         error: (err) => {

@@ -1,6 +1,8 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { forkJoin } from 'rxjs';
 import { AdminService, AdminPost, AdminReport, AdminUser } from '../core/services/admin.service';
+import { UserService } from '../core/services/user.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -13,34 +15,43 @@ export class AdminDashboardComponent implements OnInit {
   users: AdminUser[] = [];
   posts: AdminPost[] = [];
   reports: AdminReport[] = [];
+  currentUser: any = null;
   loading = false;
   errorMessage = '';
 
-  constructor(private adminService: AdminService, private change: ChangeDetectorRef) {}
+  constructor(
+    private adminService: AdminService, 
+    private userService: UserService,
+    private change: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
+    this.userService.me().subscribe((user: any) => this.currentUser = user);
     this.loadAll();
   }
 
   loadAll() {
     this.loading = true;
     this.errorMessage = '';
-    this.adminService.getUsers().subscribe({
-      next: (res) => (this.users = res ?? [], this.change.markForCheck()),
-      error: (err) => console.error(err)
-    });
-    this.adminService.getPosts().subscribe({
-      next: (res) => (this.posts = res ?? [], this.change.markForCheck()),
-      error: (err) => console.error(err)
-    });
-    this.adminService.getReports().subscribe({
-      next: (res) => (this.reports = res ?? [], this.change.markForCheck()),
+    
+    forkJoin({
+      users: this.adminService.getUsers(),
+      posts: this.adminService.getPosts(),
+      reports: this.adminService.getReports()
+    }).subscribe({
+      next: (res) => {
+        this.users = res.users ?? [];
+        this.posts = res.posts ?? [];
+        this.reports = res.reports ?? [];
+        this.loading = false;
+        this.change.markForCheck();
+      },
       error: (err) => {
         console.error(err);
         this.loading = false;
         this.errorMessage = 'Failed to load admin data.';
-      },
-      complete: () => (this.loading = false)
+        this.change.markForCheck();
+      }
     });
   }
 
@@ -96,5 +107,17 @@ export class AdminDashboardComponent implements OnInit {
     }
     const parsed = new Date(value);
     return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
+  }
+  formatStatus(enabled: boolean) {
+    return enabled ? 'Active' : 'Banned';
+  }
+  statusClass(enabled: boolean) {
+    return enabled ? 'status-active' : 'status-banned';
+  }
+  statusAction(enabled: boolean) {
+    return enabled ? 'Ban' : 'Unban';
+  }
+  statusActionClass(enabled: boolean) {
+    return enabled ? 'btn-ban' : 'btn-unban';
   }
 }

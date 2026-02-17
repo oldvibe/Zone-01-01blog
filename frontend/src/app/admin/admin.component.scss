@@ -1,68 +1,15 @@
-.admin-shell {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 16px 80px;
-  display: grid;
-  gap: 24px;
-}
-
-.admin-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.admin-header__eyebrow {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--ink-soft);
-  margin: 0 0 6px;
-}
-
-.admin-nav {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.admin-grid {
-  display: grid;
-  gap: 20px;
-}
-
-.admin-panel {
+.admin-section {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 22px;
-  padding: 20px;
-  box-shadow: var(--shadow);
-  display: grid;
-  gap: 16px;
-}
-
-.admin-list {
-  display: grid;
-  gap: 12px;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
 }
 
 .admin-card {
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 14px 16px;
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  background: var(--surface-muted);
+  transition: all 0.2s;
+  &:hover {
+    background: var(--surface-hover);
+  }
 }
 
-.admin-card p {
-  margin: 6px 0;
-}
-
-.admin-actions {
-  display: grid;
-  gap: 8px;
-}
+.smaller { font-size: 0.75rem; }

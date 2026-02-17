@@ -1,35 +1,45 @@
-<section class="notifications-shell">
-  <header class="notifications-header">
-    <div>
-      <p class="notifications-header__eyebrow">Inbox</p>
-      <h1>Notifications</h1>
-    </div>
-    <nav class="notifications-nav">
-      <a routerLink="/posts" class="btn btn--ghost">Feed</a>
-      <a routerLink="/profile" class="btn btn--ghost">Profile</a>
-      <a routerLink="/explore" class="btn btn--ghost">Explore</a>
-    </nav>
-  </header>
+<section class="notifications-page container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <header class="mb-5 d-flex justify-content-between align-items-end">
+        <div>
+          <p class="text-primary fw-bold text-uppercase tracking-wider small mb-2">Activities</p>
+          <h1 class="fw-bold mb-0">Notifications</h1>
+        </div>
+        <div class="small text-muted" *ngIf="items.length">
+          {{ items.length }} total updates
+        </div>
+      </header>
 
-  <p *ngIf="loading" class="helper">Loading...</p>
-  <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+      <div *ngIf="loading" class="text-center py-5"><span class="spinner-border text-primary"></span></div>
+      
+      <div class="alert alert-danger" *ngIf="errorMessage">{{ errorMessage }}</div>
 
-  <div class="notifications-list" *ngIf="items.length">
-    <article class="notification-card" *ngFor="let item of items">
-      <div>
-        <p class="notification-card__message">{{ item.message }}</p>
-        <span class="notification-card__time">{{ item.createdAt }}</span>
+      <div class="notifications-list d-grid gap-3" *ngIf="items.length">
+        <article class="card p-4 border-0 shadow-sm" *ngFor="let item of items" [class.opacity-75]="item.read" [style.border-left]="item.read ? 'none' : '4px solid var(--primary)'">
+          <div class="d-flex justify-content-between align-items-center gap-4">
+            <div class="d-flex align-items-start gap-3">
+              <div class="icon-wrap bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-grid place-items-center" style="width: 40px; height: 40px;">
+                <i class="bi bi-lightning-charge"></i>
+              </div>
+              <div>
+                <p class="mb-1 fw-medium text-ink">{{ item.message }}</p>
+                <small class="text-muted">{{ item.createdAt | date:'medium' }}</small>
+              </div>
+            </div>
+            
+            <button class="btn btn-sm" [class.btn--ghost]="item.read" [class.btn-primary]="!item.read" [disabled]="item.read" (click)="markRead(item.id)">
+              <i class="bi" [class.bi-check2-circle]="item.read" [class.bi-check2]="!item.read"></i>
+              {{ item.read ? 'Read' : 'Mark' }}
+            </button>
+          </div>
+        </article>
       </div>
-      <button
-        class="btn btn--ghost"
-        type="button"
-        [disabled]="item.read"
-        (click)="markRead(item.id)"
-      >
-        {{ item.read ? 'Read' : 'Mark as read' }}
-      </button>
-    </article>
-  </div>
 
-  <p *ngIf="!loading && !items.length" class="helper">No notifications yet.</p>
+      <div *ngIf="!loading && !items.length" class="text-center py-5 bg-white rounded-4 border">
+        <div class="display-1 text-muted opacity-10 mb-3"><i class="bi bi-bell-slash"></i></div>
+        <p class="text-muted">No new notifications.</p>
+      </div>
+    </div>
+  </div>
 </section>

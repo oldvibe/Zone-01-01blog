@@ -6,6 +6,7 @@ import { PostService } from './post.service';
 import { FollowService } from '../core/services/follow.service';
 import { ReportService } from '../core/services/report.service';
 import { FileService } from '../core/services/file.service';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-posts',
@@ -20,7 +21,8 @@ export class PostsComponent implements OnInit, OnDestroy {
   errorMessage = '';
   form: FormGroup;
   reportForm: FormGroup;
-  selectedFile?: File;
+  selectedFiles: File[] = [];
+  mediaPreviews: { url: string; isVideo: boolean }[] = [];
   mediaPreview: string | null = null;
   mediaPreviewIsVideo = false;
   feedMode: 'public' | 'subscriptions' = 'public';
@@ -33,6 +35,7 @@ export class PostsComponent implements OnInit, OnDestroy {
     private followService: FollowService,
     private reportService: ReportService,
     private fileService: FileService,
+    private authService: AuthService,
     private fb: FormBuilder,
     private router: Router,
     private chdr: ChangeDetectorRef,
@@ -95,17 +98,17 @@ export class PostsComponent implements OnInit, OnDestroy {
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) {
-      this.selectedFile = undefined;
-      this.mediaPreview = null;
-      this.mediaPreviewIsVideo = false;
       return;
     }
-    if (this.mediaPreview) {
-      URL.revokeObjectURL(this.mediaPreview);
-    }
-    this.selectedFile = input.files[0];
-    this.mediaPreview = URL.createObjectURL(this.selectedFile);
-    this.mediaPreviewIsVideo = this.selectedFile.type.startsWith('video');
+    
+    Array.from(input.files).forEach(file => {
+      this.selectedFiles.push(file);
+      const url = URL.createObjectURL(file);
+      this.mediaPreviews.push({
+        url: url,
+        isVideo: file.type.startsWith('video')
+      });
+    });
   }
 
   createPost() {
@@ -114,13 +117,15 @@ export class PostsComponent implements OnInit, OnDestroy {
     }
 
     const { content, mediaUrl } = this.form.value;
-    const submit = (finalUrl?: string) => {
-      this.postService.create(content, finalUrl ?? mediaUrl).subscribe({
+    const mediaUrls: string[] = mediaUrl ? [mediaUrl] : [];
+
+    const submit = () => {
+      this.postService.create(content, mediaUrls).subscribe({
         next: (created) => {
           this.form.reset();
-          this.selectedFile = undefined;
-          this.mediaPreview = null;
-          this.mediaPreviewIsVideo = false;
+          this.selectedFiles = [];
+          this.mediaPreviews.forEach(p => URL.revokeObjectURL(p.url));
+          this.mediaPreviews = [];
           if (created) {
             this.posts = [created, ...this.posts];
           } else {
@@ -134,16 +139,25 @@ export class PostsComponent implements OnInit, OnDestroy {
       });
     };
 
-    if (this.selectedFile) {
-      this.fileService.upload(this.selectedFile).subscribe({
-        next: (path) => submit(path),
-        error: (err) => {
-          this.errorMessage = 'Failed to upload media.';
-          console.error(err);
-        }
+    if (this.selectedFiles.length > 0) {
+      let uploadedCount = 0;
+      this.selectedFiles.forEach(file => {
+        this.fileService.upload(file).subscribe({
+          next: (path) => {
+            mediaUrls.push(path);
+            uploadedCount++;
+            if (uploadedCount === this.selectedFiles.length) {
+              submit();
+            }
+          },
+          error: (err) => {
+            this.errorMessage = 'Failed to upload media.';
+            console.error(err);
+          }
+        });
       });
     } else {
-      submit(mediaUrl);
+      submit();
     }
   }
 
@@ -198,6 +212,17 @@ export class PostsComponent implements OnInit, OnDestroy {
       });
   }
 
+  deletePost(id: number) {
+    if (confirm('Are you sure you want to delete this post?')) {
+      this.postService.delete(id).subscribe({
+        next: () => {
+          this.posts = this.posts.filter(p => p.id !== id);
+        },
+        error: (err) => console.error(err)
+      });
+    }
+  }
+
   toggleFollow(post: any) {
     if (!post?.authorId || post?.mine) {
       return;
@@ -233,9 +258,14 @@ export class PostsComponent implements OnInit, OnDestroy {
     return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
   }
 
+  isVideo(url: string): boolean {
+    const extensions = ['.mp4', '.webm', '.ogg', '.mov'];
+    return extensions.some(ext => url.toLowerCase().endsWith(ext));
+  }
+
   logout() {
-    localStorage.removeItem('token');
-    this.router.navigate(['/']);
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 
   ngOnDestroy() {

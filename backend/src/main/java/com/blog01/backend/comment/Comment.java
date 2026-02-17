@@ -25,6 +25,10 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     private Post post;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comment parent;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 }

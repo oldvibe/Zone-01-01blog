@@ -1,5 +1,8 @@
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/like/PostLikeController.java
+/home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/messaging/dto/ConversationResponse.java
+/home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/messaging/Conversation.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/comment/CommentController.java
+/home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/messaging/Message.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/security/UserPrincipal.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/report/ReportRepository.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/post/dto/PostResponse.java
@@ -22,6 +25,7 @@
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/config/security/JwtAuthenticationFilter.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/BackendApplication.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/comment/Comment.java
+/home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/messaging/MessageRepository.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/user/User.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/notification/NotificationResponse.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/notification/NotificationController.java
@@ -42,13 +46,18 @@
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/comment/CommentResponse.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/auth/AuthService.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/common/ApiException.java
+/home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/messaging/ConversationRepository.java
+/home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/messaging/MessagingController.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/auth/dto/RegisterRequest.java
+/home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/messaging/MessagingService.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/admin/AdminController.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/user/dto/UserResponse.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/common/enums/Role.java
+/home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/messaging/dto/MessageResponse.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/notification/Notification.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/follow/FollowRepository.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/post/PostController.java
+/home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/messaging/dto/MessageRequest.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/report/ReportResponse.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/auth/dto/LoginRequest.java
 /home/ynaitedd/Desktop/blog/backend/src/main/java/com/blog01/backend/like/PostLikeService.java

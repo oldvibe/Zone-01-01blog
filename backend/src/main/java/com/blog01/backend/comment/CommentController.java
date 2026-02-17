@@ -34,7 +34,7 @@ public class CommentController {
             @RequestBody CommentRequest request,
             @AuthenticationPrincipal UserDetails user
     ) {
-        return commentService.addComment(postId, request.getContent(), user.getUsername());
+        return commentService.addComment(postId, request.getContent(), request.getParentId(), user.getUsername());
     }
 
     /**

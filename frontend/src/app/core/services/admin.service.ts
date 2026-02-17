@@ -23,7 +23,7 @@ export interface AdminUser {
 export interface AdminPost {
   id: number;
   content: string;
-  mediaUrl?: string;
+  mediaUrls?: string[];
   authorId: number;
   authorUsername: string;
   createdAt: string;

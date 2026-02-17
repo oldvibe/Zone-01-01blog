@@ -1,17 +1,14 @@
 <section class="admin-shell">
-  <header class="admin-header">
-    <div>
-      <p class="admin-header__eyebrow">Control</p>
-      <h1>Admin</h1>
-      <p class="helper">Administration area.</p>
+  <div class="bg-dark text-white py-2 px-4 d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-shield-lock-fill text-danger"></i>
+      <span class="small fw-bold text-uppercase tracking-wider">Admin Mode</span>
     </div>
-    <nav class="admin-nav">
-      <a routerLink="/admin/dashboard" class="btn btn--ghost">Dashboard</a>
-      <a routerLink="/posts" class="btn btn--ghost">Feed</a>
-      <a routerLink="/explore" class="btn btn--ghost">Explore</a>
-      <a routerLink="/settings" class="btn btn--ghost">Settings</a>
-    </nav>
-  </header>
+    <div class="d-flex gap-3">
+      <a routerLink="/admin/dashboard" class="text-white text-decoration-none small" routerLinkActive="text-danger">Dashboard</a>
+      <a routerLink="/posts" class="text-white text-decoration-none small opacity-50">Exit to Site</a>
+    </div>
+  </div>
 
   <router-outlet></router-outlet>
 </section>

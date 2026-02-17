@@ -1,81 +1,170 @@
-<section class="posts-shell">
-  <header class="posts-header">
-    <div>
-      <p class="posts-header__eyebrow">Your space</p>
-      <h1>Feed</h1>
-    </div>
-    <nav class="posts-nav">
-      <a routerLink="/profile" class="btn btn--ghost">Profile</a>
-      <a routerLink="/notifications" class="btn btn--ghost">Notifications</a>
-      <button class="btn btn--ghost" type="button" (click)="logout()">Logout</button>
-    </nav>
-  </header>
-
-  <div class="posts-switch">
-    <button type="button" class="btn btn--ghost" [class.is-active]="feedMode === 'public'" (click)="setMode('public')">
-      Public feed
-    </button>
-    <button type="button" class="btn btn--ghost" [class.is-active]="feedMode === 'subscriptions'"
-      (click)="setMode('subscriptions')">
-      Following
-    </button>
-  </div>
-
-  <form class="posts-composer" [formGroup]="form" (ngSubmit)="createPost()">
-    <div class="field">
-      <label for="content">Share an update</label>
-      <textarea id="content" rows="3" placeholder="What's on your mind?" formControlName="content"></textarea>
-    </div>
-    <div class="field">
-      <label for="mediaUrl">Media URL (optional)</label>
-      <input id="mediaUrl" type="text" placeholder="https://..." formControlName="mediaUrl" />
-    </div>
-    <div class="field">
-      <label for="mediaFile">Upload media (optional)</label>
-      <input id="mediaFile" type="file" (change)="onFileSelected($event)" />
-      <div *ngIf="mediaPreview" class="media-preview">
-        <video *ngIf="mediaPreviewIsVideo" [src]="mediaPreview" muted controls></video>
-        <img *ngIf="!mediaPreviewIsVideo" [src]="mediaPreview" alt="Media preview" />
-      </div>
-    </div>
-    <button class="btn" type="submit">Post</button>
-  </form>
-
-  <p *ngIf="loading" class="helper">Loading...</p>
-  <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
-
-  <div class="posts-list" *ngIf="posts.length">
-    <article class="post-card" *ngFor="let post of posts">
-      <header class="post-card__header">
-        <div>
-          <p class="post-card__author">{{ post.authorUsername || 'unknown' }}</p>
-          <p class="post-card__date">{{ formatDate(post.createdAt || post.created_at || '') }}</p>
+<section class="posts-shell container py-5">
+  <div class="row g-4">
+    <!-- Left Sidebar: Profile Summary (Optional but looks good) -->
+    <aside class="col-lg-3 d-none d-lg-block">
+      <div class="card p-4 sticky-top" style="top: 100px;">
+        <div class="text-center mb-4">
+          <div class="avatar-placeholder mx-auto mb-3">
+            <i class="bi bi-person-fill h2 mb-0"></i>
+          </div>
+          <h5 class="fw-bold mb-1">Your Feed</h5>
+          <p class="text-muted small">Stay updated with your peers.</p>
         </div>
-        <button class="btn btn--ghost" type="button" *ngIf="!post.mine" (click)="toggleFollow(post)">
-          {{ isFollowing(post) ? 'Unfollow' : 'Follow' }}
-        </button>
-      </header>
-      <div class="post-card__content">{{ post.content }}</div>
-      <img *ngIf="post.mediaUrl" [src]="'http://localhost:8080'+post.mediaUrl" alt="Post media" />
-      <div class="post-card__meta">
-        <button class="btn btn--ghost" type="button" (click)="toggleLike(post)">
-          {{ post.likedByMe ? 'Liked' : 'Like' }} · {{ post.likes || 0 }}
-        </button>
-        <button class="btn btn--ghost" type="button" (click)="openReport(post)">
-          Report
-        </button>
-        <a class="btn btn--ghost" [routerLink]="['/posts', post.id]">Comments</a>
+        <div class="d-grid gap-2">
+          <a routerLink="/profile" class="btn btn--ghost justify-content-start">
+            <i class="bi bi-person me-2"></i>View Profile
+          </a>
+          <a routerLink="/settings" class="btn btn--ghost justify-content-start">
+            <i class="bi bi-gear me-2"></i>Settings
+          </a>
+          <button class="btn btn--ghost justify-content-start text-danger" (click)="logout()">
+            <i class="bi bi-box-arrow-right me-2"></i>Logout
+          </button>
+        </div>
       </div>
-      <form *ngIf="reportingPostId === post.id" class="post-report" [formGroup]="reportForm"
-        (ngSubmit)="submitReport(post)">
-        <textarea rows="2" placeholder="Why are you reporting this post?" formControlName="reason"></textarea>
-        <button class="btn" type="submit">Submit report</button>
-        <p *ngIf="reportMessage" class="helper">{{ reportMessage }}</p>
+    </aside>
+
+    <!-- Main Feed -->
+    <main class="col-lg-6">
+      <!-- Feed Switch -->
+      <div class="d-flex gap-2 mb-4">
+        <button type="button" class="btn flex-grow-1" [class.btn-primary]="feedMode === 'public'" [class.btn--ghost]="feedMode !== 'public'" (click)="setMode('public')">
+          Public Feed
+        </button>
+        <button type="button" class="btn flex-grow-1" [class.btn-primary]="feedMode === 'subscriptions'" [class.btn--ghost]="feedMode !== 'subscriptions'" (click)="setMode('subscriptions')">
+          Following
+        </button>
+      </div>
+
+      <!-- Post Composer -->
+      <form class="card p-4 mb-4 border-primary border-opacity-25" [formGroup]="form" (ngSubmit)="createPost()">
+        <div class="d-flex gap-3 mb-3">
+          <div class="avatar-sm flex-shrink-0"></div>
+          <div class="flex-grow-1">
+            <textarea id="content" rows="3" class="form-control border-0 bg-light" placeholder="Share your learning progress..." formControlName="content" style="resize: none;"></textarea>
+          </div>
+        </div>
+        
+        <div class="media-preview-grid" *ngIf="mediaPreviews.length">
+          <div *ngFor="let media of mediaPreviews" class="media-item">
+            <video *ngIf="media.isVideo" [src]="media.url" muted controls></video>
+            <img *ngIf="!media.isVideo" [src]="media.url" alt="Media preview" />
+          </div>
+        </div>
+
+        <hr class="my-3 opacity-10">
+
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex gap-2">
+            <label for="mediaFile" class="btn btn-sm btn--ghost" style="cursor: pointer;">
+              <i class="bi bi-image text-primary me-2"></i>Media
+              <input id="mediaFile" type="file" multiple (change)="onFileSelected($event)" class="d-none" />
+            </label>
+            <button type="button" class="btn btn-sm btn--ghost" (click)="mediaUrlInput.focus()">
+              <i class="bi bi-link-45deg text-primary"></i>
+            </button>
+          </div>
+          <button class="btn btn-primary px-4" type="submit" [disabled]="form.invalid || loading">
+            Post
+          </button>
+        </div>
+        
+        <input #mediaUrlInput id="mediaUrl" type="text" class="form-control form-control-sm mt-3" placeholder="Paste media URL here..." formControlName="mediaUrl" />
       </form>
-    </article>
+
+      <p *ngIf="loading" class="text-center py-5 text-muted">
+        <span class="spinner-border spinner-border-sm me-2"></span>Loading your feed...
+      </p>
+      
+      <div *ngIf="errorMessage" class="alert alert-danger rounded-4 shadow-sm mb-4">
+        <i class="bi bi-exclamation-triangle me-2"></i>{{ errorMessage }}
+      </div>
+
+      <!-- Posts List -->
+      <div class="posts-list d-grid gap-4" *ngIf="posts.length">
+        <article class="card p-4 overflow-hidden" *ngFor="let post of posts">
+          <header class="d-flex justify-content-between align-items-start mb-3">
+            <div class="d-flex gap-3">
+              <div class="avatar-sm bg-primary bg-opacity-10 text-primary d-grid place-items-center fw-bold">
+                {{ post.authorUsername?.charAt(0).toUpperCase() }}
+              </div>
+              <div>
+                <h6 class="fw-bold mb-0">{{ post.authorUsername || 'Anonymous' }}</h6>
+                <p class="text-muted smaller mb-0">{{ formatDate(post.createdAt || post.created_at || '') }}</p>
+              </div>
+            </div>
+            <div class="dropdown">
+              <button class="btn btn--ghost btn-sm" *ngIf="!post.mine" (click)="toggleFollow(post)">
+                {{ isFollowing(post) ? 'Unfollow' : 'Follow' }}
+              </button>
+              <button class="btn btn--ghost btn-sm text-danger" *ngIf="post.mine" (click)="deletePost(post.id)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </header>
+
+          <div class="post-content mb-3" style="white-space: pre-wrap;">{{ post.content }}</div>
+
+          <div class="media-grid" *ngIf="post.mediaUrls?.length">
+            <ng-container *ngFor="let url of post.mediaUrls">
+              <img *ngIf="!isVideo(url)" [src]="url" alt="Post content" loading="lazy" />
+              <video *ngIf="isVideo(url)" [src]="url" muted controls></video>
+            </ng-container>
+          </div>
+
+          <div class="d-flex gap-4 mt-2">
+            <button class="btn btn-sm" [class.btn-primary]="post.likedByMe" [class.btn--ghost]="!post.likedByMe" (click)="toggleLike(post)">
+              <i class="bi" [class.bi-heart-fill]="post.likedByMe" [class.bi-heart]="!post.likedByMe"></i>
+              {{ post.likes || 0 }}
+            </button>
+            <a class="btn btn-sm btn--ghost" [routerLink]="['/posts', post.id]">
+              <i class="bi bi-chat"></i> Comments
+            </a>
+            <button class="btn btn-sm btn--ghost ms-auto" (click)="openReport(post)">
+              <i class="bi bi-flag"></i>
+            </button>
+          </div>
+
+          <!-- Quick Report Form -->
+          <form *ngIf="reportingPostId === post.id" class="mt-4 p-3 bg-light rounded-4 border" [formGroup]="reportForm" (ngSubmit)="submitReport(post)">
+            <label class="small fw-bold mb-2">Report Post</label>
+            <textarea rows="2" class="form-control mb-2" placeholder="Tell us why this post is inappropriate..." formControlName="reason"></textarea>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-danger px-3" type="submit">Submit</button>
+              <button class="btn btn-sm btn-light" type="button" (click)="reportingPostId = null">Cancel</button>
+            </div>
+            <p *ngIf="reportMessage" class="small text-success mt-2 mb-0">{{ reportMessage }}</p>
+          </form>
+        </article>
+      </div>
+
+      <div *ngIf="!loading && !posts.length" class="text-center py-5">
+        <div class="display-1 text-muted opacity-10 mb-4"><i class="bi bi-journal-text"></i></div>
+        <h4 class="text-muted">No posts found</h4>
+        <p class="text-muted small">Be the first one to share an update!</p>
+      </div>
+    </main>
+
+    <!-- Right Sidebar: Trends/Creators -->
+    <aside class="col-lg-3">
+      <div class="card p-4 mb-4">
+        <h6 class="fw-bold mb-3">Student Hub</h6>
+        <div class="small text-muted mb-3">Welcome to 01Blog. A place to share your technical journey.</div>
+        <ul class="list-unstyled d-grid gap-2 mb-0">
+          <li><i class="bi bi-check2-circle text-success me-2"></i> Share snippets</li>
+          <li><i class="bi bi-check2-circle text-success me-2"></i> Document bugs</li>
+          <li><i class="bi bi-check2-circle text-success me-2"></i> Follow peers</li>
+        </ul>
+      </div>
+      
+      <div class="card p-4">
+        <h6 class="fw-bold mb-3">Community Rules</h6>
+        <div class="smaller text-muted">
+          1. Be respectful<br>
+          2. No spamming<br>
+          3. Helpful content only
+        </div>
+      </div>
+    </aside>
   </div>
-
-  <p *ngIf="!loading && !posts.length" class="helper">No posts yet.</p>
-
-  <a class="posts-back" routerLink="/">Back to login</a>
 </section>

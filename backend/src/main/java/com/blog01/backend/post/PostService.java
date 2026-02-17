@@ -96,7 +96,7 @@ public class PostService {
         }
 
         post.setContent(request.content());
-        post.setMediaUrl(request.mediaUrl());
+        post.setMediaUrls(request.mediaUrls());
         postRepository.save(post);
 
         return postMapper.toDto(post, requester);
@@ -112,7 +112,7 @@ public class PostService {
 
         Post post = Post.builder()
                 .content(request.content())
-                .mediaUrl(request.mediaUrl())
+                .mediaUrls(request.mediaUrls())
                 .author(user)
                 .createdAt(java.time.LocalDateTime.now())
                 .visible(true)

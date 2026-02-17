@@ -35,7 +35,8 @@ public class CommentService {
                         comment.getContent(),
                         comment.getAuthor().getUsername(),
                         comment.getAuthor().getId().equals(currentUser.getId()),
-                        comment.getCreatedAt()
+                        comment.getCreatedAt(),
+                        comment.getParent() != null ? comment.getParent().getId() : null
                 ))
                 .toList();
     }
@@ -43,7 +44,7 @@ public class CommentService {
     /**
      * 🔹 Add comment
      */
-        public CommentResponse addComment(Long postId, String content, String username) {
+        public CommentResponse addComment(Long postId, String content, Long parentId, String username) {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
@@ -51,10 +52,17 @@ public class CommentService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Post not found"));
 
+        Comment parent = null;
+        if (parentId != null) {
+            parent = commentRepository.findById(parentId)
+                    .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Parent comment not found"));
+        }
+
         Comment comment = Comment.builder()
                 .content(content)
                 .author(user)
                 .post(post)
+                .parent(parent)
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -65,7 +73,8 @@ public class CommentService {
                 comment.getContent(),
                 user.getUsername(),
                 true,
-                comment.getCreatedAt()
+                comment.getCreatedAt(),
+                parentId
         );
     }
 

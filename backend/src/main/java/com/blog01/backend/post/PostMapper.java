@@ -27,7 +27,7 @@ public class PostMapper {
         return new PostResponse(
                 post.getId(),
                 post.getContent(),
-                post.getMediaUrl(),
+                post.getMediaUrls(),
                 authorId,
                 authorUsername,
                 post.getCreatedAt(),

@@ -2,7 +2,8 @@ FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY pom.xml mvnw mvnw.cmd ./
 COPY .mvn .mvn
-RUN ./mvnw -q -DskipTests dependency:go-offline
+RUN chmod +x mvnw \
+ && ./mvnw -q -DskipTests dependency:go-offline
 COPY src src
 RUN ./mvnw -q -DskipTests package
 

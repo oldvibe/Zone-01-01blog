@@ -26,6 +26,7 @@ export class PostDetailComponent implements OnInit {
   reportMessage = '';
   commentReportMessage = '';
   followingIds = new Set<number>();
+  replyingToId: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -103,21 +104,35 @@ export class PostDetailComponent implements OnInit {
     });
   }
 
+  setReply(commentId: number | null) {
+    this.replyingToId = commentId;
+    if (commentId) {
+      this.form.patchValue({ content: `@Reply to #${commentId}: ` });
+    } else {
+      this.form.reset();
+    }
+  }
+
   addComment() {
     if (this.form.invalid || !this.post?.id) {
       return;
     }
     const content = this.form.value.content;
+    const parentId = this.replyingToId || undefined;
+
     const optimistic = {
       id: Date.now(),
       content,
       author: 'You',
       owner: true,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      parentId: parentId
     } as CommentItem;
     this.comments = [optimistic, ...this.comments];
     this.form.reset();
-    this.commentService.add(this.post.id, content).subscribe({
+    this.replyingToId = null;
+
+    this.commentService.add(this.post.id, content, parentId).subscribe({
       next: (comment) => {
         this.comments = [
           comment,
@@ -243,5 +258,10 @@ export class PostDetailComponent implements OnInit {
     }
     const parsed = new Date(value);
     return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
+  }
+
+  isVideo(url: string): boolean {
+    const extensions = ['.mp4', '.webm', '.ogg', '.mov'];
+    return extensions.some(ext => url.toLowerCase().endsWith(ext));
   }
 }

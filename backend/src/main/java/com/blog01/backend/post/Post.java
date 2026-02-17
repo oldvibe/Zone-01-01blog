@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter @Setter
@@ -18,7 +19,8 @@ public class Post {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    private String mediaUrl;
+    @ElementCollection
+    private List<String> mediaUrls;
 
     @Builder.Default
     @Column(nullable = false)

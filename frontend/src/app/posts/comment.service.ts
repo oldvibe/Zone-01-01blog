@@ -7,6 +7,7 @@ export interface CommentItem {
   author: string;
   owner: boolean;
   createdAt: string;
+  parentId?: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -19,8 +20,8 @@ export class CommentService {
     return this.http.get<CommentItem[]>(`${this.api}/${postId}/comments`);
   }
 
-  add(postId: number, content: string) {
-    return this.http.post<CommentItem>(`${this.api}/${postId}/comments`, { content });
+  add(postId: number, content: string, parentId?: number) {
+    return this.http.post<CommentItem>(`${this.api}/${postId}/comments`, { content, parentId });
   }
 
   remove(commentId: number) {

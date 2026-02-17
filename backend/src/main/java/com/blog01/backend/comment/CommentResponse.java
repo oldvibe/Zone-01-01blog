@@ -13,4 +13,5 @@ public class CommentResponse {
     private String author;
     private boolean owner;
     private LocalDateTime createdAt;
+    private Long parentId;
 }

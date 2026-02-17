@@ -1,52 +1,37 @@
-<section class="settings-shell">
-  <header class="settings-header">
-    <div>
-      <p class="settings-header__eyebrow">Preferences</p>
-      <h1>Settings</h1>
-    </div>
-    <nav class="settings-nav">
-      <a routerLink="/posts" class="btn btn--ghost">Feed</a>
-      <a routerLink="/profile" class="btn btn--ghost">Profile</a>
-      <a routerLink="/notifications" class="btn btn--ghost">Notifications</a>
-    </nav>
-  </header>
+<section class="settings-page container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-sm border-0 rounded-4 p-4">
+        <header class="mb-4">
+          <h2 class="fw-bold">Settings</h2>
+          <p class="text-muted small">Manage your profile and account.</p>
+        </header>
 
-  <p *ngIf="loading" class="helper">Loading settings...</p>
-  <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+        <p *ngIf="loading" class="text-center">Loading settings...</p>
+        <p *ngIf="errorMessage" class="text-danger text-center">{{ errorMessage }}</p>
 
-  <section class="settings-card">
-    <div>
-      <h2>Account</h2>
-      <p class="helper">Manage your profile overview.</p>
-    </div>
-    <form class="settings-form" [formGroup]="form" (ngSubmit)="saveProfile()">
-      <label>
-        <span class="label">Username</span>
-        <input type="text" formControlName="username" />
-      </label>
-      <label>
-        <span class="label">Email</span>
-        <input type="email" formControlName="email" />
-      </label>
-      <button class="btn" type="submit">Save</button>
-    </form>
-  </section>
+        <form [formGroup]="form" (ngSubmit)="saveProfile()" *ngIf="!loading">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Username</label>
+            <input type="text" class="form-control rounded-3" formControlName="username" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Email</label>
+            <input type="email" class="form-control rounded-3" formControlName="email" />
+          </div>
+          <button type="submit" class="btn btn-primary w-100 py-2 rounded-3" [disabled]="loading">
+            Save Profile
+          </button>
+        </form>
 
-  <section class="settings-card">
-    <div>
-      <h2>Display</h2>
-      <p class="helper">Choose how dense your dashboard feels.</p>
-    </div>
-    <button class="btn btn--ghost" type="button" (click)="toggleCompactMode()">
-      {{ compactMode ? 'Disable' : 'Enable' }} compact mode
-    </button>
-  </section>
+        <hr class="my-4" />
 
-  <section class="settings-card">
-    <div>
-      <h2>Session</h2>
-      <p class="helper">Sign out of your account.</p>
+        <div class="d-grid gap-2">
+          <button class="btn btn-outline-danger py-2 rounded-3" type="button" (click)="logout()">
+            Logout
+          </button>
+        </div>
+      </div>
     </div>
-    <button class="btn" type="button" (click)="logout()">Logout</button>
-  </section>
+  </div>
 </section>

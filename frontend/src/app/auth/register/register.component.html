@@ -1,102 +1,76 @@
-<div class="auth-wrapper d-flex w-100">
-  <aside class="image-side d-none d-lg-block position-relative">
-    <div class="image-bg"></div>
-    <div class="image-overlay"></div>
-    <div class="blob s1"></div>
-    <div class="blob s2"></div>
-
-    <div class="position-absolute top-0 start-0 p-4 text-white">
-      <div class="brand mb-4">
-        <div class="logo"><i class="bi bi-lightning-charge-fill"></i></div>
-        <h4 class="mb-0">JUJUTSU HUB</h4>
+<div class="auth-wrapper d-flex min-vh-100">
+  <aside class="image-side d-none d-lg-flex flex-column justify-content-center p-5 text-white position-relative overflow-hidden" 
+         style="flex: 0 0 40%; background: var(--primary-gradient);">
+    <div class="position-absolute top-0 start-0 p-5">
+      <div class="brand d-flex align-items-center gap-2">
+        <div class="bg-white text-primary rounded-3 p-2 d-grid place-items-center" style="width: 40px; height: 40px;">
+          <i class="bi bi-lightning-charge-fill h5 mb-0"></i>
+        </div>
+        <span class="fw-bold h4 mb-0">01Blog</span>
       </div>
     </div>
 
-    <div class="position-absolute bottom-0 start-0 p-16 text-white" style="max-width:420px;">
-      <span class="badge">Cursed Community</span>
-      <h2 class="display-title">Master Your <span class="text-primary">Energy</span></h2>
-      <p class="muted-sm">Join the most exclusive circle of curse users and unlock premium content.</p>
+    <div class="auth-content mt-5">
+      <h1 class="display-5 fw-bold mb-4">Join the community of student creators.</h1>
+      <p class="lead opacity-75">Start your digital journal today and connect with peers from around the world.</p>
     </div>
+    
+    <div class="blob position-absolute" style="bottom: -100px; left: -100px; width: 300px; height: 300px; background: rgba(255,255,255,0.1); border-radius: 50%; filter: blur(60px);"></div>
   </aside>
 
-  <main class="form-side d-flex align-items-center justify-content-center w-100 p-4">
-    <div class="auth-card mx-auto">
-      <div class="d-lg-none mb-4 d-flex align-items-center gap-3">
-        <div class="logo"><i class="bi bi-lightning-charge-fill"></i></div>
-        <h4 class="mb-0">JUJUTSU HUB</h4>
-      </div>
-
-      <header class="mb-4 text-center text-lg-start">
-        <h2 class="display-title">Join the Curse</h2>
-        <p class="muted-sm mb-0">Create your account to start your journey.</p>
+  <main class="form-side d-flex align-items-center justify-content-center flex-grow-1 p-4 bg-white">
+    <div class="auth-card w-100" style="max-width: 480px;">
+      <header class="mb-5">
+        <h2 class="fw-bold text-ink h1 mb-2">Create Account</h2>
+        <p class="text-muted">Start documenting your path to excellence.</p>
       </header>
 
-      <form [formGroup]="form" (ngSubmit)="register()">
-        <div class="mb-3">
-          <label for="fullName" class="form-label small text-muted">Full Name</label>
-          <div class="input-group flex-nowrap">
-            <span class="input-group-text icon-wrap" id="name-addon"><i class="bi bi-person"></i></span>
-            <input id="fullName" type="text" class="form-control" placeholder="Gojo Satoru" formControlName="fullName" aria-describedby="name-addon" />
-          </div>
+      <form [formGroup]="form" (ngSubmit)="register()" class="d-grid gap-3">
+        <div class="form-group">
+          <label class="form-label small fw-bold text-uppercase">Username</label>
+          <input type="text" class="form-control" placeholder="Choose a handle" formControlName="fullName">
         </div>
 
-        <div class="mb-3">
-          <label for="email" class="form-label small text-muted">Email Address</label>
-          <div class="input-group flex-nowrap">
-            <span class="input-group-text icon-wrap" id="reg-email-addon"><i class="bi bi-envelope"></i></span>
-            <input id="email" type="email" class="form-control" placeholder="domain@domain.com" formControlName="email" aria-describedby="reg-email-addon" />
-          </div>
+        <div class="form-group">
+          <label class="form-label small fw-bold text-uppercase">Email Address</label>
+          <input type="email" class="form-control" placeholder="name@school.com" formControlName="email">
         </div>
 
         <div class="row g-3">
           <div class="col-md-6">
-            <label for="password" class="form-label small text-muted">Password</label>
-            <div class="input-group flex-nowrap">
-              <span class="input-group-text icon-wrap"><i class="bi bi-lock"></i></span>
-              <input id="password" [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder="••••••••" formControlName="password" />
-              <button type="button" class="btn btn-icon" aria-label="Toggle password visibility" (click)="togglePassword()"><i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i></button>
+            <div class="form-group">
+              <label class="form-label small fw-bold text-uppercase">Password</label>
+              <input [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder="••••••••" formControlName="password">
             </div>
           </div>
           <div class="col-md-6">
-            <label for="confirm" class="form-label small text-muted">Confirm</label>
-            <div class="input-group flex-nowrap">
-              <span class="input-group-text icon-wrap"><i class="bi bi-shield-lock"></i></span>
-              <input id="confirm" [type]="showConfirm ? 'text' : 'password'" class="form-control" placeholder="••••••••" formControlName="confirm" />
-              <button type="button" class="btn btn-icon" aria-label="Toggle confirm visibility" (click)="toggleConfirm()"><i [class]="showConfirm ? 'bi bi-eye-slash' : 'bi bi-eye'"></i></button>
+            <div class="form-group">
+              <label class="form-label small fw-bold text-uppercase">Confirm</label>
+              <input [type]="showConfirm ? 'text' : 'password'" class="form-control" placeholder="••••••••" formControlName="confirm">
             </div>
           </div>
         </div>
 
-        <div class="form-check mt-3 mb-2">
-          <input class="form-check-input" type="checkbox" id="agree" formControlName="agree" />
-          <label class="form-check-label small text-muted" for="agree">I agree to the <a class="text-primary" href="#">Terms of Service</a></label>
+        <div class="form-check my-2">
+          <input class="form-check-input" type="checkbox" id="agree" formControlName="agree">
+          <label class="form-check-label small text-muted" for="agree">
+            I agree to the <a href="#" class="text-decoration-none">Community Guidelines</a>.
+          </label>
         </div>
 
-        <div class="d-grid mt-3">
-          <button class="btn btn-gradient" type="submit" [disabled]="submitting">{{ submitting ? 'Creating...' : 'Create Account' }} <i class="bi bi-arrow-right ms-2"></i></button>
+        <div *ngIf="errorMessage" class="alert alert-danger smaller p-2 rounded-3 border-0 bg-danger bg-opacity-10 text-danger mb-0">
+          <i class="bi bi-info-circle me-2"></i>{{ errorMessage }}
         </div>
 
-        <p *ngIf="errorMessage" class="text-danger text-center mt-3">{{ errorMessage }}</p>
+        <button class="btn btn-primary py-3 mt-3" type="submit" [disabled]="form.invalid || submitting">
+          <span *ngIf="submitting" class="spinner-border spinner-border-sm me-2"></span>
+          {{ submitting ? 'Creating your account...' : 'Get Started Now' }}
+        </button>
       </form>
 
-      <div class="my-4 d-flex align-items-center">
-        <div class="divider me-3"></div>
-        <small class="text-uppercase text-muted">Or Register With</small>
-        <div class="divider ms-3"></div>
+      <div class="text-center mt-5 pt-4 border-top">
+        <p class="text-muted small">Already have an account? <a routerLink="/login" class="text-primary fw-bold text-decoration-none">Sign in</a></p>
       </div>
-
-      <div class="row g-2 mb-3">
-        <div class="col-6">
-          <button class="social-btn w-100" type="button"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyCxpHBvfC8gnzncE7TE0Z6CHUdmGjG1SvLlq10rLsoDBhAECuiChNhhvYpvwAJsnPZx5TpkxTaNOTAeHivg39U4FsT8GsR0AjDH8J5QeSAfxpF71Y0pwx5-L1uI8oSpFe-_dHs1e5DrJBg0w6X_XII3IghGF1jU1rMMDGc1fPUghi0fds5Js3wOVJthPwpC28oMMzZbOolwZOHae4-XvODcCfuM3mmYzzV6RqounL9oqVnrQAOdDI86nEedAW0IU7GKoR32dQ060" alt="Google" width="18" height="18"/> <span class="small">Google</span></button>
-        </div>
-        <div class="col-6">
-          <button class="social-btn w-100" type="button"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLFGjI1z3544Jd9sW3M5MrojQIS_I5dfJiU8Ws64CXWrwOOkM14A6WIQjzBLIfaAtpNWcHtsK46wvpDPinpx5sGh_3Wqk-jhiiWH9k-S3Y5RnwDircCshAL7sI5kj8eME-0tJDyou60vEnyIKhbT-NzUHFBbSgCvDF-YNP_HyFnQc1NqgvHxJULw3wgUehJpiJeaeuvJD8dJNAUYBDhjcVcYlKtBnTsmde-ZwVhsSklMbYBtK0Jl8Ubs_Hvc9XgiFNRR4KqZ3QRdw" alt="Discord" width="18" height="18"/> <span class="small">Discord</span></button>
-        </div>
-      </div>
-
-      <p class="text-center muted-sm">Already have an account? <a routerLink="/login" class="text-primary fw-bold">Login</a></p>
-
-      <footer class="small text-center mt-3">© 2024 Anime Blog Platform • Built for Fans</footer>
     </div>
   </main>
 </div>

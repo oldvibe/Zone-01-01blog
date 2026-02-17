@@ -1,64 +1,97 @@
-<p *ngIf="loading" class="helper">Loading admin data...</p>
-<p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+<section class="admin-dashboard container py-5">
+  <header class="mb-5">
+    <p class="text-danger fw-bold text-uppercase tracking-wider small mb-2">Management</p>
+    <h1 class="fw-bold mb-0">System Control</h1>
+  </header>
 
-<div class="admin-grid">
-  <section class="admin-panel">
-    <h2>Users</h2>
-    <p *ngIf="!users.length" class="helper">No users found.</p>
-    <div class="admin-list" *ngIf="users.length">
-      <article class="admin-card" *ngFor="let user of users">
-        <div>
-          <strong>{{ user.username }}</strong>
-          <p class="helper">{{ user.email }}</p>
-          <p class="helper">Role: {{ user.role }}</p>
-        </div>
-        <div class="admin-actions">
-          <button class="btn btn--ghost" type="button" (click)="banUser(user.id)">
-            {{ user.enabled ? 'Ban' : 'Banned' }}
-          </button>
-          <button class="btn btn--ghost" type="button" (click)="deleteUser(user.id)">
-            Delete
-          </button>
-        </div>
-      </article>
-    </div>
-  </section>
+  <p *ngIf="loading" class="text-center py-5"><span class="spinner-border text-danger"></span></p>
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
-  <section class="admin-panel">
-    <h2>Posts</h2>
-    <p *ngIf="!posts.length" class="helper">No posts found.</p>
-    <div class="admin-list" *ngIf="posts.length">
-      <article class="admin-card" *ngFor="let post of posts">
-        <div>
-          <strong>{{ post.authorUsername }}</strong>
-          <p class="helper">{{ formatDate(post.createdAt) }}</p>
-          <p>{{ post.content }}</p>
+  <div class="row g-4" *ngIf="!loading">
+    <!-- Users Section -->
+    <div class="col-lg-4">
+      <section class="admin-section h-100">
+        <h5 class="fw-bold mb-4 d-flex align-items-center">
+          <i class="bi bi-people me-2"></i>Students
+        </h5>
+        <div class="d-grid gap-3">
+          <div *ngFor="let user of users" class="card p-3 border-0 shadow-sm">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <h6 class="fw-bold mb-0 text-ink">{{ user.username }}</h6>
+                <small class="text-muted d-block">{{ user.email }}</small>
+                <span class="badge mt-2" [class.bg-success]="user.enabled" [class.bg-secondary]="!user.enabled">
+                  {{ user.enabled ? 'Active' : 'Banned' }}
+                </span>
+              </div>
+              <div class="d-flex gap-1" *ngIf="currentUser?.id !== user.id">
+                <button class="btn btn-sm btn--ghost" (click)="banUser(user.id)" [title]="user.enabled ? 'Ban' : 'Unban'">
+                  <i class="bi" [class.bi-slash-circle]="user.enabled" [class.bi-check-circle]="!user.enabled"></i>
+                </button>
+                <button class="btn btn-sm btn--ghost text-danger" (click)="deleteUser(user.id)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <p *ngIf="!users.length" class="small text-muted text-center py-3">No students found.</p>
         </div>
-        <div class="admin-actions">
-          <button class="btn btn--ghost" type="button" (click)="hidePost(post.id)">Hide</button>
-          <button class="btn btn--ghost" type="button" (click)="deletePost(post.id)">Delete</button>
-        </div>
-      </article>
+      </section>
     </div>
-  </section>
 
-  <section class="admin-panel">
-    <h2>Reports</h2>
-    <p *ngIf="!reports.length" class="helper">No pending reports.</p>
-    <div class="admin-list" *ngIf="reports.length">
-      <article class="admin-card" *ngFor="let report of reports">
-        <div>
-          <strong>{{ report.targetType }} #{{ report.targetId }}</strong>
-          <p class="helper">{{ report.reason }}</p>
-          <p class="helper">By {{ report.reporterUsername }}</p>
+    <!-- Posts Section -->
+    <div class="col-lg-4">
+      <section class="admin-section h-100">
+        <h5 class="fw-bold mb-4 d-flex align-items-center">
+          <i class="bi bi-journal-text me-2"></i>Content
+        </h5>
+        <div class="d-grid gap-3">
+          <div *ngFor="let post of posts" class="card p-3 border-0 shadow-sm">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="fw-bold small">{{ post.authorUsername }}</span>
+              <div class="d-flex gap-1">
+                <button class="btn btn-sm btn--ghost" (click)="hidePost(post.id)" title="Toggle Visibility">
+                  <i class="bi bi-eye-slash"></i>
+                </button>
+                <button class="btn btn-sm btn--ghost text-danger" (click)="deletePost(post.id)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+            <p class="small text-ink-muted mb-0" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+              {{ post.content }}
+            </p>
+          </div>
+          <p *ngIf="!posts.length" class="small text-muted text-center py-3">No posts found.</p>
         </div>
-        <div class="admin-actions">
-          <button class="btn btn--ghost" type="button" (click)="resolveReport(report.id)">
-            {{ report.resolved ? 'Resolved' : 'Resolve' }}
-          </button>
-          <button class="btn btn--ghost" type="button" (click)="deleteReport(report.id)">Delete</button>
-        </div>
-      </article>
+      </section>
     </div>
-  </section>
-</div>
+
+    <!-- Reports Section -->
+    <div class="col-lg-4">
+      <section class="admin-section h-100">
+        <h5 class="fw-bold mb-4 d-flex align-items-center">
+          <i class="bi bi-flag me-2 text-danger"></i>Reports
+        </h5>
+        <div class="d-grid gap-3">
+          <div *ngFor="let report of reports" class="card p-3 border-0 shadow-sm" [class.bg-light]="report.resolved">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge bg-danger bg-opacity-10 text-danger smaller">{{ report.targetType }}</span>
+              <div class="d-flex gap-1">
+                <button class="btn btn-sm btn-success" *ngIf="!report.resolved" (click)="resolveReport(report.id)">
+                  <i class="bi bi-check-lg"></i>
+                </button>
+                <button class="btn btn-sm btn--ghost text-danger" (click)="deleteReport(report.id)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+            <p class="small fw-bold mb-1">By {{ report.reporterUsername }}</p>
+            <p class="smaller text-ink-muted mb-0">{{ report.reason }}</p>
+          </div>
+          <p *ngIf="!reports.length" class="small text-muted text-center py-3">No pending reports.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+</section>

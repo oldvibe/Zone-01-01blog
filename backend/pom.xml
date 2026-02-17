@@ -86,27 +86,12 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- H2 Database (for development without PostgreSQL) -->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
-
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
 
-    
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-core</artifactId>
-        <version>5.7.0</version>
-      </dependency>
-      
     </dependencies>
 
     <build>

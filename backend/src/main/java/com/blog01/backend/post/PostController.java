@@ -22,7 +22,7 @@ public class PostController {
     @GetMapping
     public Page<PostResponse> getAll(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "20") int size,
             @AuthenticationPrincipal UserPrincipal user
     ) {
         return postService.getFeed(user, page, size);
@@ -46,7 +46,7 @@ public class PostController {
     public Page<PostResponse> getSubscriptionsFeed(
             @AuthenticationPrincipal UserPrincipal user,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "20") int size
     ) {
         return postService.getSubscriptionsFeed(user.getId(), page, size);
     }

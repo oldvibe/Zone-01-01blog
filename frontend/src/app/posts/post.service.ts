@@ -20,12 +20,12 @@ export class PostService {
     return this.http.get<any>(`${this.api}/subscriptions?page=${page}`);
   }
 
-  create(content: string, mediaUrl?: string) {
-    return this.http.post(this.api, { content, mediaUrl });
+  create(content: string, mediaUrls?: string[]) {
+    return this.http.post(this.api, { content, mediaUrls });
   }
 
-  update(id: number, content: string, mediaUrl?: string) {
-    return this.http.put(`${this.api}/${id}`, { content, mediaUrl });
+  update(id: number, content: string, mediaUrls?: string[]) {
+    return this.http.put(`${this.api}/${id}`, { content, mediaUrls });
   }
 
   delete(id: number) {

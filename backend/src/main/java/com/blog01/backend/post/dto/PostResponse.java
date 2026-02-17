@@ -1,11 +1,12 @@
 package com.blog01.backend.post.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record PostResponse(
         Long id,
         String content,
-        String mediaUrl,
+        List<String> mediaUrls,
 
         Long authorId,
         String authorUsername,

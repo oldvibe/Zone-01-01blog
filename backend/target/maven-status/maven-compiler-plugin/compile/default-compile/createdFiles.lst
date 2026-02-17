@@ -10,7 +10,9 @@ com/blog01/backend/post/Post$PostBuilder.class
 com/blog01/backend/user/User$UserBuilder.class
 com/blog01/backend/config/security/SecurityConfig.class
 com/blog01/backend/user/dto/UserResponse.class
+com/blog01/backend/messaging/Conversation.class
 com/blog01/backend/comment/CommentResponse.class
+com/blog01/backend/messaging/dto/MessageResponse.class
 com/blog01/backend/common/enums/Role.class
 com/blog01/backend/auth/dto/RegisterRequest.class
 com/blog01/backend/report/ReportController.class
@@ -34,8 +36,11 @@ com/blog01/backend/BackendApplication.class
 com/blog01/backend/post/dto/PostRequest.class
 com/blog01/backend/auth/AuthService.class
 com/blog01/backend/post/Post.class
+com/blog01/backend/messaging/ConversationRepository.class
 com/blog01/backend/follow/FollowRepository.class
 com/blog01/backend/follow/FollowController.class
+com/blog01/backend/messaging/dto/ConversationResponse.class
+com/blog01/backend/messaging/Message$MessageBuilder.class
 com/blog01/backend/post/PostController.class
 com/blog01/backend/follow/Follow$FollowBuilder.class
 com/blog01/backend/like/PostLike$PostLikeBuilder.class
@@ -45,7 +50,10 @@ com/blog01/backend/user/UserRepository.class
 com/blog01/backend/post/PostMapper.class
 com/blog01/backend/follow/Follow.class
 com/blog01/backend/common/GlobalExceptionHandler.class
+com/blog01/backend/messaging/Conversation$ConversationBuilder.class
 com/blog01/backend/common/ApiException.class
+com/blog01/backend/messaging/Message.class
+com/blog01/backend/messaging/MessagingController.class
 com/blog01/backend/comment/Comment$CommentBuilder.class
 com/blog01/backend/common/ApiError.class
 com/blog01/backend/like/PostLike.class
@@ -58,8 +66,11 @@ com/blog01/backend/config/security/JwtService.class
 com/blog01/backend/user/dto/UpdateUserRequest.class
 com/blog01/backend/notification/NotificationController.class
 com/blog01/backend/admin/AdminController.class
+com/blog01/backend/messaging/MessageRepository.class
 com/blog01/backend/report/ReportResponse.class
 com/blog01/backend/report/Report$ReportBuilder.class
+com/blog01/backend/messaging/MessagingService.class
 com/blog01/backend/report/ReportResponse$ReportResponseBuilder.class
+com/blog01/backend/messaging/dto/MessageRequest.class
 com/blog01/backend/notification/Notification$NotificationBuilder.class
 com/blog01/backend/follow/FollowUserResponse.class

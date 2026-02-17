@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef , Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService, UserProfile } from '../core/services/user.service';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-settings',
@@ -15,13 +16,15 @@ export class SettingsComponent implements OnInit {
   user?: UserProfile;
   loading = false;
   errorMessage = '';
-  compactMode = localStorage.getItem('compactMode') === 'true';
   form: FormGroup;
+  
 
   constructor(
     private userService: UserService,
     private router: Router,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private change: ChangeDetectorRef,
   ) {
     this.form = this.fb.group({
       username: ['', Validators.required],
@@ -30,7 +33,6 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit() {
-    document.body.classList.toggle('compact', this.compactMode);
     this.loadProfile();
   }
 
@@ -43,13 +45,16 @@ export class SettingsComponent implements OnInit {
         this.form.patchValue({
           username: res.username,
           email: res.email
+          
         });
         this.loading = false;
+        this.change.markForCheck();
       },
       error: (err) => {
         console.error(err);
         this.loading = false;
         this.errorMessage = 'Failed to load settings.';
+         this.change.markForCheck();
       }
     });
   }
@@ -62,22 +67,18 @@ export class SettingsComponent implements OnInit {
     this.userService.updateMe(this.form.value).subscribe({
       next: (res) => {
         this.user = res;
+         this.change.markForCheck();
       },
       error: (err) => {
         console.error(err);
         this.errorMessage = 'Failed to update profile.';
+         this.change.markForCheck();
       }
     });
   }
 
-  toggleCompactMode() {
-    this.compactMode = !this.compactMode;
-    localStorage.setItem('compactMode', String(this.compactMode));
-    document.body.classList.toggle('compact', this.compactMode);
-  }
-
   logout() {
-    localStorage.removeItem('token');
-    this.router.navigate(['/']);
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

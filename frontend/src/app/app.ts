@@ -6,9 +6,10 @@ import { NotificationService } from './core/services/notification.service';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrls: ['./app.scss']
 })
 export class App implements OnInit {
   protected readonly title = signal('frontend');
@@ -38,6 +39,6 @@ export class App implements OnInit {
   }
 
   isLoggedIn() {
-    return !!localStorage.getItem('token');
+    return !!(localStorage.getItem('token') || sessionStorage.getItem('token'));
   }
 }
