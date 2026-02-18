@@ -9,10 +9,12 @@ import com.blog01.backend.user.User;
 import com.blog01.backend.user.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -22,14 +24,17 @@ public class AuthService {
     private final com.blog01.backend.config.security.JwtService jwtService;
 
     public AuthResponse register(RegisterRequest request) {
+        log.info("Attempting to register user: {}", request.getUsername());
 
         // ✅ check username
         if (userRepository.existsByUsername(request.getUsername())) {
+            log.warn("Registration failed: Username {} already taken", request.getUsername());
             throw new ApiException(HttpStatus.CONFLICT, "Username already taken");
         }
 
         // ✅ check email
         if (userRepository.existsByEmail(request.getEmail())) {
+            log.warn("Registration failed: Email {} already in use", request.getEmail());
             throw new ApiException(HttpStatus.CONFLICT, "Email already in use");
         }
 
@@ -43,20 +48,29 @@ public class AuthService {
                 .build();
 
         userRepository.save(user);
+        log.info("User registered successfully: {}", user.getUsername());
 
         String token = jwtService.generateToken(user.getUsername());
         return new AuthResponse(token);
     }
 
     public AuthResponse login(LoginRequest request) {
+        log.info("Login attempt for email: {}", request.email());
+        
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
+                .orElseThrow(() -> {
+                    log.warn("Login failed: User not found for email {}", request.email());
+                    return new ApiException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+                });
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            log.warn("Login failed: Invalid password for user {}", user.getUsername());
             throw new ApiException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
 
         String token = jwtService.generateToken(user.getUsername());
+        log.info("User logged in successfully: {}", user.getUsername());
+        
         return new AuthResponse(token);
     }
 }

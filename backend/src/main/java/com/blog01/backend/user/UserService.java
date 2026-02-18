@@ -47,10 +47,10 @@ public class UserService {
 				.toList();
 	}
 
-	public void ban(Long id) {
+	public void toggleBan(Long id) {
 		User user = userRepository.findById(id)
 				.orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
-		user.setEnabled(false);
+		user.setEnabled(!user.isEnabled());
 		userRepository.save(user);
 	}
 

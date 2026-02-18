@@ -56,10 +56,10 @@ public class PostService {
                 .toList();
     }
 
-    public void setInvisible(Long id) {
+    public void toggleVisibility(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Post not found"));
-        post.setVisible(false);
+        post.setVisible(!post.isVisible());
         postRepository.save(post);
     }
 
@@ -82,6 +82,9 @@ public class PostService {
     }
 
     public PostResponse update(Long postId, Long requesterId, PostRequest request) {
+        if (request.mediaUrls().size() > 3) {
+                throw  new ApiException(HttpStatus.BAD_REQUEST, "we don't accept more than 3 files");
+        }
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Post not found"));
         User requester = userRepository.findById(requesterId)
@@ -106,6 +109,9 @@ public class PostService {
     public PostResponse create(Long id, PostRequest request) {
         if (id == null) {
             throw new ApiException(HttpStatus.UNAUTHORIZED, "Unauthenticated");
+        }
+        if (request.mediaUrls().size() > 3) {
+                throw  new ApiException(HttpStatus.BAD_REQUEST, "we don't accept more than 3 files");
         }
 
         User user = userRepository.findById(id)

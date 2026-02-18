@@ -101,7 +101,21 @@ export class PostsComponent implements OnInit, OnDestroy {
       return;
     }
     
-    Array.from(input.files).forEach(file => {
+    const remainingSlots = 3 - this.selectedFiles.length;
+    if (remainingSlots <= 0) {
+      this.errorMessage = 'You can only upload a maximum of 3 media files.';
+      input.value = '';
+      return;
+    }
+
+    const filesToAdd = Array.from(input.files).slice(0, remainingSlots);
+    if (input.files.length > remainingSlots) {
+      this.errorMessage = 'Only the first ' + remainingSlots + ' files were added. Max 3 files allowed.';
+    } else {
+      this.errorMessage = '';
+    }
+
+    filesToAdd.forEach(file => {
       this.selectedFiles.push(file);
       const url = URL.createObjectURL(file);
       this.mediaPreviews.push({
@@ -109,6 +123,17 @@ export class PostsComponent implements OnInit, OnDestroy {
         isVideo: file.type.startsWith('video')
       });
     });
+    // Reset input to allow selecting same file again if removed
+    input.value = '';
+  }
+
+  removeMedia(index: number) {
+    const removed = this.mediaPreviews.splice(index, 1)[0];
+    if (removed) {
+      URL.revokeObjectURL(removed.url);
+    }
+    this.selectedFiles.splice(index, 1);
+    this.chdr.markForCheck();
   }
 
   createPost() {
@@ -281,5 +306,7 @@ export class PostsComponent implements OnInit, OnDestroy {
     }
   }
 }
+
+
 
 

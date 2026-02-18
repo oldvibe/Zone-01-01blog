@@ -20,8 +20,9 @@ spring:
   servlet:
     multipart:
       max-file-size: 50MB
-      max-request-size: 50MB
+      max-request-size: 10MB
 
 jwt:
-  secret: mysupersecretkey123mysupersecretkey123mysupersecretkey123mysupersecretkey123
+  # In production, use environment variables: JWT_SECRET
+  secret: ${JWT_SECRET:L2ndLfpr7CrFH3iNA21GyQQc3tsNIZujXkr3DuuuTIM=}
   expiration: 86400000

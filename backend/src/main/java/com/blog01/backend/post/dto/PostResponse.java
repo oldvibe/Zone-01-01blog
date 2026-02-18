@@ -15,6 +15,7 @@ public record PostResponse(
 
         long likes,
         boolean likedByMe,
-        boolean mine
+        boolean mine,
+        boolean visible
 ) {
 }

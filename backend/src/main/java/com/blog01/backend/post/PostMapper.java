@@ -33,7 +33,8 @@ public class PostMapper {
                 post.getCreatedAt(),
                 likeRepository.countByPost(post),
                 likedByMe,
-                mine
+                mine,
+                post.isVisible()
         );
     }
 }

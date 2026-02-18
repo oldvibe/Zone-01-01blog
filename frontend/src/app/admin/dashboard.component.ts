@@ -56,9 +56,9 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   banUser(id: number) {
-    this.adminService.banUser(id).subscribe({
+    this.adminService.toggleUserBan(id).subscribe({
       next: () => {
-        this.users = this.users.map((u) => (u.id === id ? { ...u, enabled: false } : u));
+        this.users = this.users.map((u) => (u.id === id ? { ...u, enabled: !u.enabled } : u));
         this.change.markForCheck();
       },
       error: (err) => console.error(err)
@@ -73,8 +73,11 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   hidePost(id: number) {
-    this.adminService.hidePost(id).subscribe({
-      next: () => {},
+    this.adminService.togglePostVisibility(id).subscribe({
+      next: () => {
+        this.posts = this.posts.map((p) => (p.id === id ? { ...p, visible: !p.visible } : p));
+        this.change.markForCheck();
+      },
       error: (err) => console.error(err)
     });
   }

@@ -30,6 +30,7 @@ export interface AdminPost {
   likes: number;
   likedByMe: boolean;
   mine: boolean;
+  visible: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -54,8 +55,8 @@ export class AdminService {
     return this.http.get<AdminPost[]>(`${this.api}/posts`);
   }
 
-  hidePost(id: number) {
-    return this.http.post(`${this.api}/posts/${id}/hide`, {});
+  togglePostVisibility(id: number) {
+    return this.http.post(`${this.api}/posts/${id}/toggle-visibility`, {});
   }
 
   deletePost(id: number) {
@@ -66,8 +67,8 @@ export class AdminService {
     return this.http.get<AdminUser[]>(`${this.api}/users`);
   }
 
-  banUser(id: number) {
-    return this.http.post(`${this.api}/users/${id}/ban`, {});
+  toggleUserBan(id: number) {
+    return this.http.post(`${this.api}/users/${id}/toggle-ban`, {});
   }
 
   deleteUser(id: number) {

@@ -1,80 +1,66 @@
 package com.blog01.backend.common;
 
-import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
-    public ResponseEntity<ApiError> handleApiException(ApiException ex, HttpServletRequest request) {
-        return ResponseEntity.status(ex.getStatus()).body(
-                new ApiError(
-                        ex.getStatus().value(),
-                        ex.getStatus().getReasonPhrase(),
-                        ex.getMessage(),
-                        request.getRequestURI(),
-                        LocalDateTime.now()
-                )
+    public ResponseEntity<ErrorResponse> handleApiException(ApiException ex) {
+        log.warn("API Exception: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                ex.getStatus().value(),
+                ex.getStatus().getReasonPhrase(),
+                ex.getMessage(),
+                null
         );
+        return new ResponseEntity<>(errorResponse, ex.getStatus());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
-        String message = ex.getBindingResult().getAllErrors().stream()
-                .filter(FieldError.class::isInstance)
-                .map(error -> ((FieldError) error).getField() + ": " + error.getDefaultMessage())
-                .findFirst()
-                .orElse("Validation error");
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        
+        log.warn("Validation failed: {}", errors);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ApiError(
-                        HttpStatus.BAD_REQUEST.value(),
-                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                        message,
-                        request.getRequestURI(),
-                        LocalDateTime.now()
-                )
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Validation Error",
+                "Input validation failed",
+                errors
         );
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-                new ApiError(
-                        HttpStatus.FORBIDDEN.value(),
-                        HttpStatus.FORBIDDEN.getReasonPhrase(),
-                        ex.getMessage(),
-                        request.getRequestURI(),
-                        LocalDateTime.now()
-                )
-        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleGeneral(Exception ex, HttpServletRequest request) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ApiError(
-                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                        "Unexpected error",
-                        request.getRequestURI(),
-                        LocalDateTime.now()
-                )
+    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
+        log.error("Unexpected error occurred", ex);
+        
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error",
+                "An unexpected error occurred",
+                null
         );
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
-
-
-
-
-
-

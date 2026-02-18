@@ -100,9 +100,9 @@
 
       <div class="posts-list d-grid gap-4" *ngIf="posts.length">
         <article class="card p-4" *ngFor="let post of posts">
-          <div class="post-content mb-3" style="white-space: pre-wrap;">{{ post.content }}</div>
+          <div class="post-content mb-3" style="white-space: pre-wrap; cursor: pointer;" [routerLink]="['/posts', post.id]">{{ post.content }}</div>
           
-          <div class="media-grid" *ngIf="post.mediaUrls?.length">
+          <div class="media-grid" *ngIf="post.mediaUrls?.length" style="cursor: pointer;" [routerLink]="['/posts', post.id]">
             <ng-container *ngFor="let url of post.mediaUrls">
               <img *ngIf="!isVideo(url)" [src]="url" alt="Post content" loading="lazy" />
               <video *ngIf="isVideo(url)" [src]="url" muted controls></video>
@@ -112,7 +112,7 @@
           <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top border-light">
             <span class="text-muted smaller fw-medium">{{ formatDate(post.createdAt) }}</span>
             <div class="d-flex gap-2">
-              <a class="btn btn-sm btn--ghost" [routerLink]="['/posts', post.id]">View Full</a>
+              <a class="btn btn-sm btn--ghost" [routerLink]="['/posts', post.id]">View All</a>
               <button class="btn btn-sm btn--ghost text-danger" *ngIf="isMe" (click)="deletePost(post.id)">
                 <i class="bi bi-trash"></i>
               </button>

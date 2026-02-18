@@ -226,10 +226,12 @@ export class ProfileComponent implements OnInit {
         next: () => {
           this.reportMessage = 'Report submitted. Thank you.';
           this.reporting = false;
+          this.change.markForCheck();
         },
         error: (err) => {
           console.error(err);
           this.reportMessage = 'Failed to submit report.';
+          this.change.markForCheck();
         }
       });
   }
@@ -238,6 +240,7 @@ export class ProfileComponent implements OnInit {
     this.postService.delete(id).subscribe({
       next: () => {
         this.posts = this.posts.filter((post) => post.id !== id);
+        this.change.markForCheck();
       },
       error: (err) => console.error(err)
     });

@@ -46,12 +46,17 @@
           <i class="bi bi-journal-text me-2"></i>Content
         </h5>
         <div class="d-grid gap-3">
-          <div *ngFor="let post of posts" class="card p-3 border-0 shadow-sm">
+          <div *ngFor="let post of posts" class="card p-3 border-0 shadow-sm" [class.opacity-50]="!post.visible">
             <div class="d-flex justify-content-between align-items-start mb-2">
-              <span class="fw-bold small">{{ post.authorUsername }}</span>
+              <div>
+                <span class="fw-bold small d-block">{{ post.authorUsername }}</span>
+                <span class="badge mt-1" [class.bg-info]="post.visible" [class.bg-warning]="!post.visible">
+                  {{ post.visible ? 'Visible' : 'Hidden' }}
+                </span>
+              </div>
               <div class="d-flex gap-1">
-                <button class="btn btn-sm btn--ghost" (click)="hidePost(post.id)" title="Toggle Visibility">
-                  <i class="bi bi-eye-slash"></i>
+                <button class="btn btn-sm btn--ghost" (click)="hidePost(post.id)" [title]="post.visible ? 'Hide' : 'Unhide'">
+                  <i class="bi" [class.bi-eye-slash]="post.visible" [class.bi-eye]="!post.visible"></i>
                 </button>
                 <button class="btn btn-sm btn--ghost text-danger" (click)="deletePost(post.id)">
                   <i class="bi bi-trash"></i>

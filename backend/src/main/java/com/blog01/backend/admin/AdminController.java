@@ -42,9 +42,9 @@ public class AdminController {
         return postService.getAllForAdmin();
     }
 
-    @PostMapping("/posts/{id}/hide")
-    public void hidePost(@PathVariable Long id) {
-        postService.setInvisible(id);
+    @PostMapping("/posts/{id}/toggle-visibility")
+    public void togglePostVisibility(@PathVariable Long id) {
+        postService.toggleVisibility(id);
     }
 
     @DeleteMapping("/posts/{id}")
@@ -59,9 +59,9 @@ public class AdminController {
         return userService.getAllForAdmin();
     }
 
-    @PostMapping("/users/{id}/ban")
-    public void banUser(@PathVariable Long id) {
-        userService.ban(id);
+    @PostMapping("/users/{id}/toggle-ban")
+    public void toggleUserBan(@PathVariable Long id) {
+        userService.toggleBan(id);
     }
 
     @DeleteMapping("/users/{id}")

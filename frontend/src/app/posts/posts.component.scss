@@ -34,6 +34,53 @@
   animation: fadeIn 0.4s ease-out forwards;
 }
 
+.media-preview-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.media-item {
+  width: 140px;
+  height: 140px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  background: var(--surface-muted);
+
+  img, video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .btn-remove-media {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: background 0.2s;
+    z-index: 2;
+
+    &:hover {
+      background: rgba(220, 53, 69, 0.9);
+    }
+    
+    i {
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+  }
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }

@@ -11,5 +11,6 @@ public record PostRequest(
         String content,
 
         // optional (image / video url)
+        @Size(max = 3, message = "We only accept a maximum of 3 media files per post")
         List<String> mediaUrls
 ) {}

@@ -45,8 +45,11 @@
           </div>
         </div>
         
-        <div class="media-preview-grid" *ngIf="mediaPreviews.length">
-          <div *ngFor="let media of mediaPreviews" class="media-item">
+        <div class="media-preview-grid mb-3" *ngIf="mediaPreviews.length">
+          <div *ngFor="let media of mediaPreviews; let i = index" class="media-item position-relative">
+            <button type="button" class="btn-remove-media" (click)="removeMedia(i)" title="Remove media">
+              <i class="bi bi-x"></i>
+            </button>
             <video *ngIf="media.isVideo" [src]="media.url" muted controls></video>
             <img *ngIf="!media.isVideo" [src]="media.url" alt="Media preview" />
           </div>
@@ -98,9 +101,9 @@
             </div>
           </header>
 
-          <div class="post-content mb-3" style="white-space: pre-wrap;">{{ post.content }}</div>
+          <div class="post-content mb-3" style="white-space: pre-wrap; cursor: pointer;" [routerLink]="['/posts', post.id]">{{ post.content }}</div>
 
-          <div class="media-grid" *ngIf="post.mediaUrls?.length">
+          <div class="media-grid" *ngIf="post.mediaUrls?.length" style="cursor: pointer;" [routerLink]="['/posts', post.id]">
             <ng-container *ngFor="let url of post.mediaUrls">
               <img *ngIf="!isVideo(url)" [src]="url" alt="Post content" loading="lazy" />
               <video *ngIf="isVideo(url)" [src]="url" muted controls></video>
