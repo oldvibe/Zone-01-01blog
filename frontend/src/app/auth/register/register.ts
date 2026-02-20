@@ -1,22 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../auth.service';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [NgIf, ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
 export class Register {
   form: FormGroup;
-  errorMessage = '';
-  submitting = false;
-  showPassword = false;
-  showConfirm = false;
+  errorMessage = signal('');
+  submitting = signal(false);
+  showPassword = signal(false);
+  showConfirm = signal(false);
 
   constructor(
     private fb: FormBuilder,
@@ -33,19 +32,19 @@ export class Register {
   }
 
   register() {
-    this.errorMessage = '';
+    this.errorMessage.set('');
     if (this.form.invalid) {
-      this.errorMessage = 'Please fill all fields correctly.';
+      this.errorMessage.set('Please fill all fields correctly.');
       this.form.markAllAsTouched();
       return;
     }
 
     if (this.form.value.password !== this.form.value.confirm) {
-      this.errorMessage = 'Passwords do not match.';
+      this.errorMessage.set('Passwords do not match.');
       return;
     }
 
-    this.submitting = true;
+    this.submitting.set(true);
     const payload = {
       username: this.form.value.fullName,
       email: this.form.value.email,
@@ -54,19 +53,19 @@ export class Register {
 
     this.authService.register(payload).subscribe({
       next: () => {
-        this.submitting = false;
-        localStorage.setItem('registrationSuccess', 'true');
-        this.router.navigate(['/login']);
+        this.submitting.set(false);
+        this.router.navigate(['/login'], { queryParams: { registered: 'true' } });
       },
       error: (err) => {
         console.error(err);
-        this.errorMessage = err?.error?.message || err?.message || 'Registration failed. Please try again.';
-        this.submitting = false;
+        this.errorMessage.set(err?.error?.message || err?.message || 'Registration failed. Please try again.');
+        this.submitting.set(false);
       }
     });
   }
 
-  togglePassword() { this.showPassword = !this.showPassword; }
-  toggleConfirm() { this.showConfirm = !this.showConfirm; }
+  togglePassword() { this.showPassword.update(v => !v); }
+  toggleConfirm() { this.showConfirm.update(v => !v); }
 }
+
 

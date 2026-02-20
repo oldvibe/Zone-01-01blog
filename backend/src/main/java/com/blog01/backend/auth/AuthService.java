@@ -68,6 +68,11 @@ public class AuthService {
             throw new ApiException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
 
+        if (!user.isEnabled()) {
+            log.warn("Login failed: Account is disabled for user {}", user.getUsername());
+            throw new ApiException(HttpStatus.FORBIDDEN, "Your account has been banned");
+        }
+
         String token = jwtService.generateToken(user.getUsername());
         log.info("User logged in successfully: {}", user.getUsername());
         

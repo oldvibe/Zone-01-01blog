@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, effect } from '@angular/core';
+import { Component, OnInit, signal, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { UserService } from './core/services/user.service';
@@ -16,12 +16,13 @@ export class App implements OnInit {
   protected readonly title = signal('frontend');
   isAdmin = signal(false);
   unreadCount = signal(0);
+  
+  private authService = inject(AuthService);
   isLoggedIn = this.authService.isLoggedIn;
 
   constructor(
     private userService: UserService,
     private notificationService: NotificationService,
-    private authService: AuthService,
     private router: Router
   ) {
     effect(() => {
@@ -44,6 +45,10 @@ export class App implements OnInit {
   loadUserData() {
     this.userService.me().subscribe({
       next: (user) => {
+        if (user && user.enabled === false) {
+          this.logout();
+          return;
+        }
         this.isAdmin.set(user?.role === 'ROLE_ADMIN' || user?.role === 'ADMIN');
       },
       error: () => {

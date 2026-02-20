@@ -1,34 +1,34 @@
 <section class="settings-page container py-5">
   <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6">
-      <div class="card shadow-sm border-0 rounded-4 p-4">
+      <div class="card shadow-lg border-0 rounded-4 p-4">
         <header class="mb-4">
-          <h2 class="fw-bold">Settings</h2>
-          <p class="text-muted small">Manage your profile and account.</p>
+          <h2 class="fw-bold brand-font">ACCOUNT SETTINGS</h2>
+          <p class="text-muted small fw-bold">Manage your profile and security settings.</p>
         </header>
 
-        <p *ngIf="loading()" class="text-center">Loading settings...</p>
-        <p *ngIf="errorMessage()" class="text-danger text-center">{{ errorMessage() }}</p>
+        <p *ngIf="loading()" class="text-center fw-bold">SYNCHRONIZING...</p>
+        <p *ngIf="errorMessage()" class="text-danger text-center fw-bold">{{ errorMessage() }}</p>
 
         <form [formGroup]="form" (ngSubmit)="saveProfile()" *ngIf="!loading()">
           <div class="mb-3">
-            <label class="form-label small fw-semibold">Username</label>
+            <label class="form-label small fw-bold text-primary">USERNAME</label>
             <input type="text" class="form-control rounded-3" formControlName="username" />
           </div>
           <div class="mb-3">
-            <label class="form-label small fw-semibold">Email</label>
+            <label class="form-label small fw-bold text-primary">EMAIL ADDRESS</label>
             <input type="email" class="form-control rounded-3" formControlName="email" />
           </div>
-          <button type="submit" class="btn btn-primary w-100 py-2 rounded-3" [disabled]="loading">
-            Save Profile
+          <button type="submit" class="btn btn-primary w-100 py-3 rounded-3 fw-bold" [disabled]="loading()">
+            UPDATE PROFILE
           </button>
         </form>
 
-        <hr class="my-4" />
+        <hr class="my-4 opacity-10" />
 
         <div class="d-grid gap-2">
-          <button class="btn btn-outline-danger py-2 rounded-3" type="button" (click)="logout()">
-            Logout
+          <button class="btn btn--ghost py-3 rounded-3 text-danger fw-bold" type="button" (click)="logout()">
+            LOGOUT ACCOUNT
           </button>
         </div>
       </div>

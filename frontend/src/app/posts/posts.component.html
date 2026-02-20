@@ -1,24 +1,24 @@
 <section class="posts-shell container py-5">
   <div class="row g-4">
-    <!-- Left Sidebar: Profile Summary (Optional but looks good) -->
+    <!-- Left Sidebar: Profile Summary -->
     <aside class="col-lg-3 d-none d-lg-block">
-      <div class="card p-4 sticky-top" style="top: 100px;">
+      <div class="card p-4 sticky-top side-widget" style="top: 100px;">
         <div class="text-center mb-4">
-          <div class="avatar-placeholder mx-auto mb-3">
+          <div class="avatar-placeholder mx-auto mb-3 shadow-lg">
             <i class="bi bi-person-fill h2 mb-0"></i>
           </div>
-          <h5 class="fw-bold mb-1">Your Feed</h5>
-          <p class="text-muted small">Stay updated with your peers.</p>
+          <h5 class="fw-bold mb-1 brand-font">DASHBOARD</h5>
+          <p class="text-muted small fw-bold">ONLINE STATUS: ACTIVE</p>
         </div>
         <div class="d-grid gap-2">
-          <a routerLink="/profile" class="btn btn--ghost justify-content-start">
-            <i class="bi bi-person me-2"></i>View Profile
+          <a routerLink="/profile" class="btn btn--ghost justify-content-start fw-bold">
+            <i class="bi bi-person-circle me-2"></i>MY PROFILE
           </a>
-          <a routerLink="/settings" class="btn btn--ghost justify-content-start">
-            <i class="bi bi-gear me-2"></i>Settings
+          <a routerLink="/settings" class="btn btn--ghost justify-content-start fw-bold">
+            <i class="bi bi-gear-wide-connected me-2"></i>SETTINGS
           </a>
-          <button class="btn btn--ghost justify-content-start text-danger" (click)="logout()">
-            <i class="bi bi-box-arrow-right me-2"></i>Logout
+          <button class="btn btn--ghost justify-content-start text-danger fw-bold" (click)="logout()">
+            <i class="bi bi-box-arrow-right me-2"></i>LOGOUT
           </button>
         </div>
       </div>
@@ -27,31 +27,33 @@
     <!-- Main Feed -->
     <main class="col-lg-6">
       <!-- Feed Switch -->
-      <div class="d-flex gap-2 mb-4">
-        <button type="button" class="btn flex-grow-1" [class.btn-primary]="feedMode() === 'public'" [class.btn--ghost]="feedMode() !== 'public'" (click)="setMode('public')">
-          Public Feed
+      <div class="feed-switch mb-4 shadow-sm">
+        <button type="button" class="btn fw-bold" [class.is-active]="feedMode() === 'public'" (click)="setMode('public')">
+          EXPLORE
         </button>
-        <button type="button" class="btn flex-grow-1" [class.btn-primary]="feedMode() === 'subscriptions'" [class.btn--ghost]="feedMode() !== 'subscriptions'" (click)="setMode('subscriptions')">
-          Following
+        <button type="button" class="btn fw-bold" [class.is-active]="feedMode() === 'subscriptions'" (click)="setMode('subscriptions')">
+          FOLLOWING
         </button>
       </div>
 
       <!-- Post Composer -->
-      <form class="card p-4 mb-4 border-primary border-opacity-25" [formGroup]="form" (ngSubmit)="createPost()">
+      <form class="card p-4 mb-4 composer-card shadow-lg" [formGroup]="form" (ngSubmit)="createPost()">
         <div class="d-flex gap-3 mb-3">
-          <div class="avatar-sm flex-shrink-0"></div>
+          <div class="avatar-sm flex-shrink-0">
+            <i class="bi bi-plus-lg"></i>
+          </div>
           <div class="flex-grow-1">
-            <textarea id="content" rows="3" class="form-control border-0 bg-light" placeholder="Share your learning progress..." formControlName="content" style="resize: none;"></textarea>
+            <textarea id="content" rows="3" class="form-control fw-bold" placeholder="What's happening in your anime world?" formControlName="content" style="resize: none; font-size: 1.1rem;"></textarea>
           </div>
         </div>
         
         <div class="media-preview-grid mb-3" *ngIf="mediaPreviews().length">
-          <div *ngFor="let media of mediaPreviews(); let i = index" class="media-item position-relative">
-            <button type="button" class="btn-remove-media" (click)="removeMedia(i)" title="Remove media">
-              <i class="bi bi-x"></i>
+          <div *ngFor="let media of mediaPreviews(); let i = index" class="media-item border-primary">
+            <button type="button" class="btn-remove-media" (click)="removeMedia(i)" title="Remove">
+              <i class="bi bi-x-lg"></i>
             </button>
             <video *ngIf="media.isVideo" [src]="media.url" muted controls></video>
-            <img *ngIf="!media.isVideo" [src]="media.url" alt="Media preview" />
+            <img *ngIf="!media.isVideo" [src]="media.url" alt="Preview" />
           </div>
         </div>
 
@@ -59,108 +61,110 @@
 
         <div class="d-flex justify-content-between align-items-center">
           <div class="d-flex gap-2">
-            <label for="mediaFile" class="btn btn-sm btn--ghost" style="cursor: pointer;">
-              <i class="bi bi-image text-primary me-2"></i>Media
+            <label for="mediaFile" class="btn btn-sm btn--ghost fw-bold" style="cursor: pointer;">
+              <i class="bi bi-camera-reels-fill text-primary me-2"></i>GALLERY
               <input id="mediaFile" type="file" multiple (change)="onFileSelected($event)" class="d-none" />
             </label>
           </div>
-          <button class="btn btn-primary px-4" type="submit" [disabled]="form.invalid || loading()">
-            Post
+          <button class="btn btn-primary px-5 fw-bold" type="submit" [disabled]="form.invalid || loading()">
+            POST
           </button>
         </div>
       </form>
 
-      <p *ngIf="loading()" class="text-center py-5 text-muted">
-        <span class="spinner-border spinner-border-sm me-2"></span>Loading your feed...
+      <p *ngIf="loading()" class="text-center py-5">
+        <span class="spinner-border text-primary me-2"></span><span class="fw-bold h5">LOADING FEED...</span>
       </p>
       
-      <div *ngIf="errorMessage()" class="alert alert-danger rounded-4 shadow-sm mb-4">
-        <i class="bi bi-exclamation-triangle me-2"></i>{{ errorMessage() }}
+      <div *ngIf="errorMessage()" class="status-msg error mb-4 shadow-sm">
+        <i class="bi bi-exclamation-octagon-fill me-2"></i>{{ errorMessage() }}
       </div>
 
       <!-- Posts List -->
       <div class="posts-list d-grid gap-4" *ngIf="posts().length">
-        <article class="card p-4 overflow-hidden" *ngFor="let post of posts()">
-          <header class="d-flex justify-content-between align-items-start mb-3">
-            <div class="d-flex gap-3">
-              <div class="avatar-sm bg-primary bg-opacity-10 text-primary d-grid place-items-center fw-bold">
-                {{ post.authorUsername?.charAt(0).toUpperCase() }}
+        @for (post of posts(); track post.id) {
+          <article class="card p-4 overflow-hidden post-card shadow-sm">
+            <header class="d-flex justify-content-between align-items-start mb-3">
+              <div class="d-flex gap-3">
+                <div class="avatar-sm fw-bold shadow-sm">
+                  {{ post.authorUsername?.charAt(0).toUpperCase() }}
+                </div>
+                <div>
+                  <h6 class="post-author mb-0 fw-bold">{{ post.authorUsername || 'Anonymous' }}</h6>
+                  <p class="post-date mb-0 fw-bold">{{ formatDate(post.createdAt || post.created_at || '') }}</p>
+                </div>
               </div>
-              <div>
-                <h6 class="fw-bold mb-0">{{ post.authorUsername || 'Anonymous' }}</h6>
-                <p class="text-muted smaller mb-0">{{ formatDate(post.createdAt || post.created_at || '') }}</p>
+              <div class="dropdown">
+                <button class="btn btn--ghost btn-sm fw-bold" *ngIf="!post.mine" (click)="toggleFollow(post)">
+                  {{ isFollowing(post) ? 'UNFOLLOW' : 'FOLLOW' }}
+                </button>
+                <button class="btn btn--ghost btn-sm text-danger fw-bold" *ngIf="post.mine" (click)="deletePost(post.id)">
+                  <i class="bi bi-trash3-fill"></i>
+                </button>
               </div>
+            </header>
+
+            <div class="post-body mb-3 fw-bold" style="white-space: pre-wrap; cursor: pointer; font-size: 1.15rem;" [routerLink]="['/posts', post.id]">{{ post.content }}</div>
+
+            <div class="media-grid" *ngIf="post.mediaUrls?.length" style="cursor: pointer;" [routerLink]="['/posts', post.id]">
+              @for (url of post.mediaUrls; track url) {
+                <img *ngIf="!isVideo(url)" [src]="url" alt="Media" loading="lazy" class="shadow-sm" />
+                <video *ngIf="isVideo(url)" [src]="url" muted controls class="shadow-sm"></video>
+              }
             </div>
-            <div class="dropdown">
-              <button class="btn btn--ghost btn-sm" *ngIf="!post.mine" (click)="toggleFollow(post)">
-                {{ isFollowing(post) ? 'Unfollow' : 'Follow' }}
+
+            <div class="d-flex gap-4 mt-2">
+              <button class="btn btn-sm btn-action fw-bold" [class.liked]="post.likedByMe" (click)="toggleLike(post)">
+                <i class="bi" [class.bi-heart-fill]="post.likedByMe" [class.bi-heart]="!post.likedByMe"></i>
+                {{ post.likes || 0 }}
               </button>
-              <button class="btn btn--ghost btn-sm text-danger" *ngIf="post.mine" (click)="deletePost(post.id)">
-                <i class="bi bi-trash"></i>
+              <a class="btn btn-sm btn--ghost fw-bold" [routerLink]="['/posts', post.id]">
+                <i class="bi bi-chat-fill"></i> COMMENTS
+              </a>
+              <button class="btn btn-sm btn--ghost ms-auto" (click)="openReport(post)">
+                <i class="bi bi-flag-fill"></i>
               </button>
             </div>
-          </header>
 
-          <div class="post-content mb-3" style="white-space: pre-wrap; cursor: pointer;" [routerLink]="['/posts', post.id]">{{ post.content }}</div>
-
-          <div class="media-grid" *ngIf="post.mediaUrls?.length" style="cursor: pointer;" [routerLink]="['/posts', post.id]">
-            <ng-container *ngFor="let url of post.mediaUrls">
-              <img *ngIf="!isVideo(url)" [src]="url" alt="Post content" loading="lazy" />
-              <video *ngIf="isVideo(url)" [src]="url" muted controls></video>
-            </ng-container>
-          </div>
-
-          <div class="d-flex gap-4 mt-2">
-            <button class="btn btn-sm" [class.btn-primary]="post.likedByMe" [class.btn--ghost]="!post.likedByMe" (click)="toggleLike(post)">
-              <i class="bi" [class.bi-heart-fill]="post.likedByMe" [class.bi-heart]="!post.likedByMe"></i>
-              {{ post.likes || 0 }}
-            </button>
-            <a class="btn btn-sm btn--ghost" [routerLink]="['/posts', post.id]">
-              <i class="bi bi-chat"></i> Comments
-            </a>
-            <button class="btn btn-sm btn--ghost ms-auto" (click)="openReport(post)">
-              <i class="bi bi-flag"></i>
-            </button>
-          </div>
-
-          <!-- Quick Report Form -->
-          <form *ngIf="reportingPostId() === post.id" class="mt-4 p-3 bg-light rounded-4 border" [formGroup]="reportForm" (ngSubmit)="submitReport(post)">
-            <label class="small fw-bold mb-2">Report Post</label>
-            <textarea rows="2" class="form-control mb-2" placeholder="Tell us why this post is inappropriate..." formControlName="reason"></textarea>
-            <div class="d-flex gap-2">
-              <button class="btn btn-sm btn-danger px-3" type="submit">Submit</button>
-              <button class="btn btn-sm btn-light" type="button" (click)="reportingPostId.set(null)">Cancel</button>
-            </div>
-            <p *ngIf="reportMessage()" class="small text-success mt-2 mb-0">{{ reportMessage() }}</p>
-          </form>
-        </article>
+            <!-- Quick Report Form -->
+            <form *ngIf="reportingPostId() === post.id" class="mt-4 p-3 rounded-4 border shadow-inner" style="background: rgba(0,0,0,0.2); border-color: rgba(255,0,0,0.2);" [formGroup]="reportForm" (ngSubmit)="submitReport(post)">
+              <label class="small fw-bold mb-2 text-danger">REPORT POST</label>
+              <textarea rows="2" class="form-control mb-2 fw-bold" placeholder="Why are you reporting this post?" formControlName="reason"></textarea>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-danger px-4 fw-bold" type="submit">SUBMIT</button>
+                <button class="btn btn-sm btn--ghost fw-bold" type="button" (click)="reportingPostId.set(null)">CANCEL</button>
+              </div>
+              <p *ngIf="reportMessage()" class="small text-success mt-2 mb-0 fw-bold">{{ reportMessage() }}</p>
+            </form>
+          </article>
+        }
       </div>
 
       <div *ngIf="!loading() && !posts().length" class="text-center py-5">
-        <div class="display-1 text-muted opacity-10 mb-4"><i class="bi bi-journal-text"></i></div>
-        <h4 class="text-muted">No posts found</h4>
-        <p class="text-muted small">Be the first one to share an update!</p>
+        <div class="display-1 text-muted opacity-10 mb-4"><i class="bi bi-postcard-heart-fill"></i></div>
+        <h4 class="text-white fw-bold">FEED IS EMPTY</h4>
+        <p class="text-muted fw-bold">Follow others to see their posts here!</p>
       </div>
     </main>
 
-    <!-- Right Sidebar: Trends/Creators -->
+    <!-- Right Sidebar -->
     <aside class="col-lg-3">
-      <div class="card p-4 mb-4">
-        <h6 class="fw-bold mb-3">Student Hub</h6>
-        <div class="small text-muted mb-3">Welcome to 01Blog. A place to share your technical journey.</div>
+      <div class="card p-4 mb-4 side-widget shadow-sm">
+        <h6 class="brand-font text-primary">HUB INFO</h6>
+        <div class="small text-white fw-bold mb-3">Welcome to AnimeBlog. Share your passion.</div>
         <ul class="list-unstyled d-grid gap-2 mb-0">
-          <li><i class="bi bi-check2-circle text-success me-2"></i> Share snippets</li>
-          <li><i class="bi bi-check2-circle text-success me-2"></i> Document bugs</li>
-          <li><i class="bi bi-check2-circle text-success me-2"></i> Follow peers</li>
+          <li class="small text-white fw-bold"><i class="bi bi-stars text-primary me-2"></i> POST CONTENT</li>
+          <li class="small text-white fw-bold"><i class="bi bi-stars text-primary me-2"></i> FOLLOW PEERS</li>
+          <li class="small text-white fw-bold"><i class="bi bi-stars text-primary me-2"></i> GET INSPIRED</li>
         </ul>
       </div>
       
-      <div class="card p-4">
-        <h6 class="fw-bold mb-3">Community Rules</h6>
-        <div class="smaller text-muted">
-          1. Be respectful<br>
-          2. No spamming<br>
-          3. Helpful content only
+      <div class="card p-4 side-widget shadow-sm">
+        <h6 class="brand-font text-primary">GUIDELINES</h6>
+        <div class="small text-white fw-bold">
+          1. BE RESPECTFUL<br>
+          2. NO SPAM<br>
+          3. PASSION ONLY
         </div>
       </div>
     </aside>

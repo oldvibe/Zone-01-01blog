@@ -1,41 +1,35 @@
-<header class="app-header d-flex justify-content-between align-items-center px-4 py-3 border-bottom bg-white sticky-top">
+<header class="app-header d-flex justify-content-between align-items-center px-4 py-3 border-bottom sticky-top" style="background: rgba(2, 6, 23, 0.95);">
   <div class="brand d-flex align-items-center gap-2" style="cursor: pointer;" routerLink="/">
-    <div class="brand-logo" style="width: 40px; height: 40px; background: var(--primary-gradient); border-radius: 12px; display: grid; place-items: center; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);">
+    <div class="brand-logo" style="width: 44px; height: 44px; background: var(--primary-gradient); border-radius: 12px; display: grid; place-items: center; box-shadow: var(--neon-glow);">
       <i class="bi bi-lightning-charge-fill text-white h5 mb-0"></i>
     </div>
-    <span class="fw-bold h4 mb-0 tracking-tight" style="color: var(--ink);">01Blog</span>
+    <span class="brand-font h4 mb-0" style="color: #ffffff; font-weight: 900; letter-spacing: 2px;">ANIME<span style="color: var(--primary);">HUB</span></span>
   </div>
 
-  <nav class="app-nav d-none d-lg-flex align-items-center gap-2" *ngIf="isLoggedIn()">
-    <a routerLink="/posts" routerLinkActive="is-active" class="nav-link">
-      <i class="bi bi-house-door me-2"></i>Feed
-    </a>
-    <a routerLink="/explore" routerLinkActive="is-active" class="nav-link">
-      <i class="bi bi-compass me-2"></i>Explore
-    </a>
+  <nav class="app-nav d-none d-lg-flex align-items-center gap-3" *ngIf="isLoggedIn()">
+    <a routerLink="/posts" routerLinkActive="is-active" class="nav-link">FEED</a>
+    <a routerLink="/explore" routerLinkActive="is-active" class="nav-link">EXPLORE</a>
     <a routerLink="/notifications" routerLinkActive="is-active" class="nav-link position-relative">
-      <i class="bi bi-bell me-2"></i>Notifications
-      <span *ngIf="unreadCount() > 0" class="badge bg-danger position-absolute top-0 start-100 translate-middle p-1 rounded-circle" style="font-size: 0.6rem; min-width: 18px;">{{ unreadCount() }}</span>
+      NOTIFICATIONS
+      <span *ngIf="unreadCount() > 0" class="badge position-absolute top-0 start-100 translate-middle p-1 rounded-circle" style="font-size: 0.6rem; min-width: 18px; border: 2px solid var(--bg);">{{ unreadCount() }}</span>
     </a>
-    <a routerLink="/profile" routerLinkActive="is-active" class="nav-link">
-      <i class="bi bi-person me-2"></i>Profile
+    <a routerLink="/profile" routerLinkActive="is-active" class="nav-link">PROFILE</a>
+    <div class="vr mx-2 text-white opacity-10"></div>
+    <a routerLink="/settings" routerLinkActive="is-active" class="nav-link" title="Settings">
+      <i class="bi bi-gear-fill"></i>
     </a>
-    <div class="vr mx-2 text-secondary opacity-25"></div>
-    <a routerLink="/settings" routerLinkActive="is-active" class="nav-link">
-      <i class="bi bi-gear"></i>
-    </a>
-    <a *ngIf="isAdmin()" routerLink="/admin" routerLinkActive="is-active" class="btn btn-sm btn-danger ms-2 px-3">Admin</a>
-    <button (click)="logout()" class="btn btn--ghost ms-2 text-danger">
-      <i class="bi bi-box-arrow-right me-2"></i>Logout
+    <a *ngIf="isAdmin()" routerLink="/admin" routerLinkActive="is-active" class="btn btn-sm btn-danger px-3">ADMIN</a>
+    <button (click)="logout()" class="btn btn-sm btn--ghost text-danger fw-bold">
+      LOGOUT
     </button>
   </nav>
 
   <nav class="app-nav d-flex gap-2" *ngIf="!isLoggedIn()">
-    <a routerLink="/login" class="btn btn--ghost px-4">Login</a>
+    <a routerLink="/login" class="btn btn--ghost px-4">Sign In</a>
     <a routerLink="/register" class="btn btn-primary px-4">Get Started</a>
   </nav>
 
-  <!-- Mobile Nav Trigger (Simple version) -->
+  <!-- Mobile Nav Trigger -->
   <button class="btn btn--ghost d-lg-none" *ngIf="isLoggedIn()">
     <i class="bi bi-list h4 mb-0"></i>
   </button>
@@ -45,8 +39,9 @@
   <router-outlet />
 </main>
 
-<footer class="py-5 mt-5 border-top bg-white">
+<footer class="py-5 mt-5 border-top" style="background: rgba(15, 23, 42, 0.4);">
   <div class="container text-center">
-    <p class="text-ink-soft small mb-0">© 2026 01Blog • The student blogging community.</p>
+    <div class="brand-font h5 mb-3" style="letter-spacing: 2px;">ANIME<span style="color: var(--primary);">HUB</span></div>
+    <p class="text-muted small mb-0 fw-bold">© 2026 ANIMEHUB • THE ULTIMATE FAN COMMUNITY.</p>
   </div>
 </footer>

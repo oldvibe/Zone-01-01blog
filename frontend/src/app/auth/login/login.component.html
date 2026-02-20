@@ -1,96 +1,91 @@
-<div class="auth-wrapper d-flex min-vh-100">
-  <aside class="image-side d-none d-lg-flex flex-column justify-content-center p-5 text-white position-relative overflow-hidden" 
-         style="flex: 0 0 45%; background: var(--primary-gradient);">
-    <div class="position-absolute top-0 start-0 p-5">
-      <div class="brand d-flex align-items-center gap-2">
-        <div class="bg-white text-primary rounded-3 p-2 d-grid place-items-center" style="width: 40px; height: 40px;">
-          <i class="bi bi-lightning-charge-fill h5 mb-0"></i>
-        </div>
-        <span class="fw-bold h4 mb-0">01Blog</span>
+<div class="anime-auth-page">
+  <div class="parallax-bg" style="background-image: url('assets/login.jpg')"></div>
+  <div class="overlay-gradient"></div>
+
+  <div class="content-wrapper">
+    <!-- Branding -->
+    <header class="anime-brand" routerLink="/">
+      <div class="logo-orb">
+        <i class="bi bi-lightning-charge-fill"></i>
       </div>
-    </div>
+      <h1 class="brand-text">Anime<span>Hub</span></h1>
+    </header>
 
-    <div class="auth-content mt-5">
-      <h1 class="display-4 fw-bold mb-4">Document your learning journey.</h1>
-      <p class="lead opacity-75 mb-5">Connect with fellow students, share your discoveries, and build your technical portfolio in one community.</p>
-      
-      <div class="d-grid gap-4 mt-5">
-        <div class="d-flex align-items-center gap-3">
-          <div class="bg-white bg-opacity-20 rounded-circle p-2"><i class="bi bi-check2"></i></div>
-          <span>Share code snippets and projects</span>
-        </div>
-        <div class="d-flex align-items-center gap-3">
-          <div class="bg-white bg-opacity-20 rounded-circle p-2"><i class="bi bi-check2"></i></div>
-          <span>Get feedback from your peers</span>
-        </div>
-        <div class="d-flex align-items-center gap-3">
-          <div class="bg-white bg-opacity-20 rounded-circle p-2"><i class="bi bi-check2"></i></div>
-          <span>Follow industry trends</span>
-        </div>
+    <main class="auth-glass-container">
+      <div class="auth-card-glass">
+        <div class="card-glow"></div>
+        
+        <header class="form-header">
+          <span class="badge-pill">Welcome Back</span>
+          <h2 class="title">Sign In</h2>
+          <p class="subtitle">Enter your details to access your feed.</p>
+        </header>
+
+        <form [formGroup]="form" (ngSubmit)="login()" class="anime-form">
+          <div class="form-group">
+            <div class="input-field">
+              <input type="email" class="anime-input" placeholder=" " formControlName="email">
+              <label class="floating-label">Email Address</label>
+              <i class="bi bi-envelope icon"></i>
+              <div class="input-glow"></div>
+            </div>
+            @if (form.get('email')?.invalid && form.get('email')?.touched) {
+              <span class="error-glow">Valid email required</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <div class="input-field">
+              <input [type]="showPassword() ? 'text' : 'password'" class="anime-input" placeholder=" " formControlName="password">
+              <label class="floating-label">Password</label>
+              <i class="bi bi-lock-fill icon"></i>
+              <button type="button" class="eye-toggle" (click)="togglePassword()">
+                <i class="bi" [class.bi-eye-fill]="!showPassword()" [class.bi-eye-slash-fill]="showPassword()"></i>
+              </button>
+              <div class="input-glow"></div>
+            </div>
+          </div>
+
+          <div class="form-meta">
+            <label class="anime-checkbox">
+              <input type="checkbox" formControlName="remember">
+              <span class="box"></span>
+              <span class="label-text">Remember Me</span>
+            </label>
+            <a href="#" class="forgot-link">Forgot Password?</a>
+          </div>
+
+          @if (successMessage()) {
+            <div class="status-msg success">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>{{ successMessage() }}</span>
+            </div>
+          }
+
+          @if (errorMessage()) {
+            <div class="status-msg error">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <span>{{ errorMessage() }}</span>
+            </div>
+          }
+
+          <button type="submit" class="btn-anime-primary" [disabled]="form.invalid || submitting()">
+            @if (submitting()) {
+              <div class="loader"></div>
+              <span>Signing In...</span>
+            } @else {
+              <span>Sign In</span>
+              <i class="bi bi-chevron-right ms-2"></i>
+            }
+          </button>
+        </form>
+
+        <footer class="form-footer">
+          <p>Not part of the hub? <a routerLink="/register" class="link-neon">Join Community</a></p>
+        </footer>
       </div>
-    </div>
-    
-    <div class="blob position-absolute" style="bottom: -100px; right: -100px; width: 400px; height: 400px; background: rgba(255,255,255,0.1); border-radius: 50%; filter: blur(80px);"></div>
-  </aside>
-
-  <main class="form-side d-flex align-items-center justify-content-center flex-grow-1 p-4 bg-white">
-    <div class="auth-card w-100" style="max-width: 420px;">
-      <div class="text-center d-lg-none mb-5">
-        <div class="brand-logo mx-auto mb-3" style="width: 48px; height: 48px; background: var(--primary-gradient); border-radius: 12px; display: grid; place-items: center;">
-          <i class="bi bi-lightning-charge-fill text-white h4 mb-0"></i>
-        </div>
-      </div>
-
-      <header class="mb-5">
-        <h2 class="fw-bold text-ink h1 mb-2">Welcome back</h2>
-        <p class="text-muted">Enter your details to access your journal.</p>
-      </header>
-
-      <form [formGroup]="form" (ngSubmit)="login()" class="d-grid gap-4">
-        <div class="form-group">
-          <label class="form-label small fw-bold text-uppercase tracking-wider">Email Address</label>
-          <div class="input-group">
-            <span class="input-group-text border-end-0 bg-transparent text-muted"><i class="bi bi-envelope"></i></span>
-            <input type="email" class="form-control border-start-0 ps-0" placeholder="name@school.com" formControlName="email">
-          </div>
-          <div *ngIf="form.get('email')?.invalid && form.get('email')?.touched" class="text-danger smaller mt-1">
-            Please enter a valid email address.
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div class="d-flex justify-content-between mb-1">
-            <label class="form-label small fw-bold text-uppercase tracking-wider mb-0">Password</label>
-          </div>
-          <div class="input-group">
-            <span class="input-group-text border-end-0 bg-transparent text-muted"><i class="bi bi-lock"></i></span>
-            <input [type]="showPassword ? 'text' : 'password'" class="form-control border-start-0 ps-0" placeholder="••••••••" formControlName="password">
-            <button class="btn btn-outline-light border border-start-0 text-muted" type="button" (click)="togglePassword()">
-              <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="d-flex justify-content-between align-items-center">
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="remember" formControlName="remember">
-            <label class="form-check-label small text-muted" for="remember">Keep me signed in</label>
-          </div>
-        </div>
-
-        <div *ngIf="errorMessage" class="alert alert-danger smaller p-2 rounded-3 border-0 bg-danger bg-opacity-10 text-danger mb-0">
-          <i class="bi bi-info-circle me-2"></i>{{ errorMessage }}
-        </div>
-
-        <button class="btn btn-primary py-3 mt-2" type="submit" [disabled]="form.invalid || submitting">
-          <span *ngIf="submitting" class="spinner-border spinner-border-sm me-2"></span>
-          {{ submitting ? 'Authenticating...' : 'Sign In' }}
-        </button>
-      </form>
-
-      <div class="text-center mt-5 pt-4 border-top">
-        <p class="text-muted small">New to 01Blog? <a routerLink="/register" class="text-primary fw-bold text-decoration-none">Create an account</a></p>
-      </div>
-    </div>
-  </main>
+    </main>
+  </div>
 </div>
+
+

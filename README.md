@@ -1,6 +1,6 @@
-# 01Blog - Social Blogging Platform for Students
+# AnimeBlog - Social Blogging Platform for Students
 
-01Blog is a fullstack social blogging platform designed for students to share their learning experiences, discoveries, and progress. Built with **Java Spring Boot** and **Angular**, it follows a clean RESTful architecture and provides a secure, interactive environment for knowledge sharing.
+AnimeBlog is a fullstack social blogging platform designed for students to share their learning experiences, discoveries, and progress. Built with **Java Spring Boot** and **Angular**, it follows a clean RESTful architecture and provides a secure, interactive environment for knowledge sharing.
 
 ## 🚀 Getting Started
 

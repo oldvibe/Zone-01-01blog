@@ -1,46 +1,46 @@
 <section class="post-detail-page container py-5">
   <div class="row justify-content-center">
-    <div class="col-lg-8">
+    <div class="col-lg-9">
       <nav class="mb-4">
-        <a routerLink="/posts" class="btn btn--ghost btn-sm">
-          <i class="bi bi-arrow-left me-2"></i>Back to Feed
+        <a routerLink="/posts" class="back-link">
+          <i class="bi bi-arrow-left"></i> Return to Feed
         </a>
       </nav>
 
       <p *ngIf="loading()" class="text-center py-5"><span class="spinner-border text-primary"></span></p>
-      <div *ngIf="errorMessage()" class="alert alert-danger">{{ errorMessage() }}</div>
+      <div *ngIf="errorMessage()" class="status-msg error">{{ errorMessage() }}</div>
 
       <!-- Main Post Card -->
-      <article *ngIf="post()" class="card p-4 p-lg-5 border-0 shadow-lg mb-5">
-        <header class="d-flex justify-content-between align-items-center mb-4">
-          <div class="d-flex gap-3 align-items-center">
-            <div class="avatar-sm bg-primary bg-opacity-10 text-primary d-grid place-items-center fw-bold h5 mb-0">
+      <article *ngIf="post()" class="card p-4 p-lg-5 post-main-card mb-5">
+        <header class="d-flex justify-content-between align-items-center mb-5">
+          <div class="d-flex gap-4 align-items-center">
+            <div class="avatar-sm h4 mb-0 fw-bold">
               {{ post().authorUsername?.charAt(0).toUpperCase() }}
             </div>
             <div>
-              <h5 class="fw-bold mb-0">{{ post().authorUsername }}</h5>
-              <p class="text-muted small mb-0">{{ formatDate(post().createdAt) }}</p>
+              <h5 class="fw-bold mb-0 brand-font">{{ post().authorUsername }}</h5>
+              <p class="text-muted small mb-0">{{ formatDate(post().createdAt) }} &middot; Intel Record</p>
             </div>
           </div>
           
           <button class="btn btn-sm" [class.btn-primary]="!isFollowingAuthor()" [class.btn-outline-primary]="isFollowingAuthor()" *ngIf="!post().mine" (click)="toggleFollow()">
-            {{ isFollowingAuthor() ? 'Unfollow' : 'Follow' }}
+            {{ isFollowingAuthor() ? 'Unsync' : 'Sync Identity' }}
           </button>
         </header>
 
-        <div class="post-body h4 fw-normal text-ink mb-4" style="white-space: pre-wrap; line-height: 1.6;">
+        <div class="post-body mb-5">
           {{ post().content }}
         </div>
 
-        <div class="media-grid mb-4" *ngIf="post().mediaUrls?.length">
-          <ng-container *ngFor="let url of post().mediaUrls">
-            <img *ngIf="!isVideo(url)" [src]="url" class="img-fluid" alt="Journal media" />
+        <div class="media-grid mb-5" *ngIf="post().mediaUrls?.length">
+          @for (url of post().mediaUrls; track url) {
+            <img *ngIf="!isVideo(url)" [src]="url" class="img-fluid" alt="Intel visual" />
             <video *ngIf="isVideo(url)" [src]="url" controls class="w-100 rounded-4"></video>
-          </ng-container>
+          }
         </div>
 
         <div class="d-flex align-items-center gap-4 border-top pt-4">
-          <button class="btn btn-lg" [class.text-primary]="post().likedByMe" [class.btn--ghost]="!post().likedByMe" (click)="toggleLike()">
+          <button class="btn btn-action-lg" [class.liked]="post().likedByMe" (click)="toggleLike()">
             <i class="bi" [class.bi-heart-fill]="post().likedByMe" [class.bi-heart]="!post().likedByMe"></i>
             <span class="ms-2">{{ post().likes || 0 }}</span>
           </button>
@@ -51,13 +51,13 @@
         </div>
 
         <!-- Inline Report -->
-        <div *ngIf="reporting()" class="mt-4 p-4 bg-light rounded-4 border border-danger border-opacity-10">
-          <h6 class="fw-bold mb-3 text-danger">Flag Inappropriate Content</h6>
+        <div *ngIf="reporting()" class="mt-4 p-4 card border-danger border-opacity-25 bg-surface">
+          <h6 class="fw-bold mb-3 text-danger brand-font">Protocol Violation Report</h6>
           <form [formGroup]="reportForm" (ngSubmit)="submitReport()">
-            <textarea rows="3" class="form-control mb-3" placeholder="Describe the issue..." formControlName="reason"></textarea>
+            <textarea rows="3" class="form-control mb-3" placeholder="Identify violation details..." formControlName="reason"></textarea>
             <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-danger px-4">Submit</button>
-              <button type="button" class="btn btn-light" (click)="reporting.set(false)">Cancel</button>
+              <button type="submit" class="btn btn-danger px-4">Broadcast</button>
+              <button type="button" class="btn btn--ghost" (click)="reporting.set(false)">Abort</button>
             </div>
             <p *ngIf="reportMessage()" class="small text-success mt-3 mb-0">{{ reportMessage() }}</p>
           </form>
@@ -66,21 +66,23 @@
 
       <!-- Comments Section -->
       <section class="comments-section" *ngIf="post()">
-        <h4 class="fw-bold mb-4">Discussions ({{ comments().length }})</h4>
+        <h4 class="section-title">Neural Discussion ({{ comments().length }})</h4>
 
         <!-- Comment Input -->
-        <div class="card p-4 mb-5 shadow-sm border-primary border-opacity-10">
+        <div class="card p-4 mb-5 comment-input-card">
           <div class="d-flex gap-3">
-            <div class="avatar-sm bg-light flex-shrink-0"></div>
+            <div class="avatar-sm flex-shrink-0" style="width: 40px; height: 40px; border-radius: 10px;">
+              <i class="bi bi-chat-dots"></i>
+            </div>
             <form [formGroup]="form" (ngSubmit)="addComment()" class="flex-grow-1">
-              <textarea rows="2" class="form-control border-0 bg-transparent ps-0" 
-                        [placeholder]="replyingToId() ? 'Replying to comment...' : 'Add to the discussion...'" 
+              <textarea rows="2" class="form-control border-0 ps-0" 
+                        [placeholder]="replyingToId() ? 'Synthesizing reply...' : 'Contribute to the discussion...'" 
                         formControlName="content" style="resize: none;"></textarea>
-              <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                <span class="small text-muted" *ngIf="replyingToId()">Replying to #{{ replyingToId() }}</span>
+              <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top border-white border-opacity-10">
+                <span class="small text-muted" *ngIf="replyingToId()">Targeting #{{ replyingToId() }}</span>
                 <div class="d-flex gap-2 ms-auto">
-                  <button *ngIf="replyingToId()" type="button" class="btn btn-sm btn--ghost" (click)="setReply(null)">Cancel</button>
-                  <button type="submit" class="btn btn-primary px-4 shadow-sm" [disabled]="form.invalid">Post Comment</button>
+                  <button *ngIf="replyingToId()" type="button" class="btn btn-sm btn--ghost" (click)="setReply(null)">Abort</button>
+                  <button type="submit" class="btn btn-primary px-4 shadow-sm" [disabled]="form.invalid">Transmitting</button>
                 </div>
               </div>
             </form>
@@ -91,57 +93,59 @@
         <div class="comments-list d-grid gap-4">
           <p *ngIf="commentsLoading()" class="text-center py-3"><span class="spinner-border spinner-border-sm text-primary"></span></p>
           
-          <div *ngFor="let comment of comments()">
-            <!-- Root Comment -->
-            <article class="d-flex gap-3" *ngIf="!comment.parentId">
-              <div class="avatar-sm bg-light flex-shrink-0 d-grid place-items-center fw-bold">
-                {{ comment.author.charAt(0).toUpperCase() }}
-              </div>
-              <div class="flex-grow-1">
-                <div class="bg-white p-3 rounded-4 border shadow-sm">
-                  <div class="d-flex justify-content-between align-items-start mb-1">
-                    <span class="fw-bold small">{{ comment.author }}</span>
-                    <span class="text-muted smaller">{{ formatDate(comment.createdAt) }}</span>
+          @for (comment of comments(); track comment.id) {
+            <div>
+              <!-- Root Comment -->
+              <article class="d-flex gap-3" *ngIf="!comment.parentId">
+                <div class="avatar-sm flex-shrink-0 fw-bold" style="width: 40px; height: 40px; border-radius: 10px; font-size: 0.9rem;">
+                  {{ comment.author.charAt(0).toUpperCase() }}
+                </div>
+                <div class="flex-grow-1">
+                  <div class="comment-bubble shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <span class="fw-bold small text-primary">{{ comment.author }}</span>
+                      <span class="text-muted smaller">{{ formatDate(comment.createdAt) }}</span>
+                    </div>
+                    <p class="mb-0 text-ink small">{{ comment.content }}</p>
                   </div>
-                  <p class="mb-0 text-ink-muted small">{{ comment.content }}</p>
-                </div>
-                <div class="d-flex gap-3 mt-2 ms-2">
-                  <button class="btn btn-sm btn-link text-muted p-0 text-decoration-none smaller fw-bold" (click)="setReply(comment.id)">Reply</button>
-                  <button class="btn btn-sm btn-link text-muted p-0 text-decoration-none smaller fw-bold" *ngIf="!comment.owner" (click)="reportComment(comment)">Report</button>
-                  <button class="btn btn-sm btn-link text-danger p-0 text-decoration-none smaller fw-bold" *ngIf="comment.owner" (click)="deleteComment(comment.id)">Delete</button>
-                </div>
+                  <div class="d-flex gap-3 mt-2 ms-2">
+                    <button class="btn btn-sm btn-link text-muted p-0 text-decoration-none smaller fw-bold" (click)="setReply(comment.id)">REPLY</button>
+                    <button class="btn btn-sm btn-link text-muted p-0 text-decoration-none smaller fw-bold" *ngIf="!comment.owner" (click)="reportComment(comment)">REPORT</button>
+                    <button class="btn btn-sm btn-link text-danger p-0 text-decoration-none smaller fw-bold" *ngIf="comment.owner" (click)="deleteComment(comment.id)">DELETE</button>
+                  </div>
 
-                <!-- Nested Replies -->
-                <div class="replies-list mt-3 d-grid gap-3 ps-lg-4">
-                  <ng-container *ngFor="let reply of comments()">
-                    <article class="d-flex gap-2" *ngIf="reply.parentId === comment.id">
-                      <div class="avatar-sm bg-light flex-shrink-0" style="width: 32px; height: 32px;"></div>
-                      <div class="flex-grow-1">
-                        <div class="bg-light p-3 rounded-4 border border-white">
-                          <div class="d-flex justify-content-between align-items-start mb-1">
-                            <span class="fw-bold small">{{ reply.author }}</span>
-                            <span class="text-muted smaller">{{ formatDate(reply.createdAt) }}</span>
+                  <!-- Nested Replies -->
+                  <div class="replies-list mt-3 d-grid gap-3 ps-lg-4">
+                    @for (reply of comments(); track reply.id) {
+                      @if (reply.parentId === comment.id) {
+                        <article class="d-flex gap-2">
+                          <div class="flex-grow-1">
+                            <div class="reply-bubble">
+                              <div class="d-flex justify-content-between align-items-start mb-1">
+                                <span class="fw-bold small text-secondary">{{ reply.author }}</span>
+                                <span class="text-muted smaller">{{ formatDate(reply.createdAt) }}</span>
+                              </div>
+                              <p class="mb-0 text-ink small">{{ reply.content }}</p>
+                            </div>
+                            <div class="d-flex gap-3 mt-1 ms-2">
+                              <button class="btn btn-sm btn-link text-muted p-0 text-decoration-none smaller fw-bold" *ngIf="!reply.owner" (click)="reportComment(reply)">REPORT</button>
+                              <button class="btn btn-sm btn-link text-danger p-0 text-decoration-none smaller fw-bold" *ngIf="reply.owner" (click)="deleteComment(reply.id)">DELETE</button>
+                            </div>
                           </div>
-                          <p class="mb-0 text-ink-muted small">{{ reply.content }}</p>
-                        </div>
-                        <div class="d-flex gap-3 mt-1 ms-2">
-                          <button class="btn btn-sm btn-link text-muted p-0 text-decoration-none smaller fw-bold" *ngIf="!reply.owner" (click)="reportComment(reply)">Report</button>
-                          <button class="btn btn-sm btn-link text-danger p-0 text-decoration-none smaller fw-bold" *ngIf="reply.owner" (click)="deleteComment(reply.id)">Delete</button>
-                        </div>
-                      </div>
-                    </article>
-                  </ng-container>
+                        </article>
+                      }
+                    }
+                  </div>
                 </div>
-              </div>
-            </article>
-          </div>
+              </article>
+            </div>
+          }
           
           <div *ngIf="!commentsLoading() && !comments().length" class="text-center py-5 opacity-50">
             <i class="bi bi-chat-square-text h1 d-block mb-3"></i>
-            <p>No comments yet. Start the conversation!</p>
+            <p>Discussion channel is idle. Initiate contributing.</p>
           </div>
         </div>
-
       </section>
     </div>
   </div>

@@ -6,18 +6,16 @@ run: docker-up
 docker-up:
 	docker compose up --build
 
-# Stop and remove containers and networks
-clean: docker-down
-
-docker-down:
+# Stop and remove containers and networks (Keep volumes)
+clean:
 	docker compose down
 
-# Stop and remove containers, networks, and volumes
+# Stop and remove containers, networks, and volumes (Delete all data)
 fclean:
 	docker compose down -v
 
-# Rebuild and run
-re: fclean run
+# Rebuild and run without deleting data
+re: clean run
 
 # --- Local Development Helpers (Non-Docker) ---
 

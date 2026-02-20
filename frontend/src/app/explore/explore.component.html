@@ -2,14 +2,14 @@
   <header class="mb-5">
     <div class="row align-items-end">
       <div class="col-md-8">
-        <p class="text-primary fw-bold text-uppercase tracking-wider small mb-2">Discover</p>
-        <h1 class="display-5 fw-bold mb-3">Explore Community</h1>
-        <p class="text-muted lead mb-0">Find new technical journals and connect with trending student creators.</p>
+        <p class="text-primary fw-bold text-uppercase tracking-wider small mb-2">DISCOVER</p>
+        <h1 class="section-title-main mb-3">EXPLORE FEED</h1>
+        <p class="lead text-muted fw-bold">Find and follow trending anime fans.</p>
       </div>
       <div class="col-md-4 text-md-end mt-4 mt-md-0">
         <nav class="d-flex gap-2 justify-content-md-end">
-          <a routerLink="/posts" class="btn btn--ghost">
-            <i class="bi bi-house-door me-2"></i>My Feed
+          <a routerLink="/posts" class="btn btn--ghost fw-bold">
+            <i class="bi bi-house-door me-2"></i>FEED
           </a>
         </nav>
       </div>
@@ -19,60 +19,58 @@
   <div class="row g-4">
     <!-- Trending Creators -->
     <aside class="col-lg-4">
-      <div class="card p-4 border-0 shadow-sm sticky-top" style="top: 100px;">
-        <h5 class="fw-bold mb-4 d-flex align-items-center">
-          <i class="bi bi-star-fill text-warning me-2"></i>Featured Creators
+      <div class="sticky-top" style="top: 100px;">
+        <h5 class="section-label">
+          <i class="bi bi-star-fill"></i>SUGGESTIONS
         </h5>
         
         <div *ngIf="loading()" class="text-center py-4"><span class="spinner-border text-primary"></span></div>
         
         <div class="creator-list d-grid gap-3">
-          <div *ngFor="let author of authors()" class="d-flex justify-content-between align-items-center p-3 rounded-4 bg-light">
-            <div class="d-flex align-items-center gap-3">
-              <div class="avatar-sm bg-white shadow-sm d-grid place-items-center fw-bold text-primary">
-                {{ author.username.charAt(0).toUpperCase() }}
+          @for (author of authors(); track author.id) {
+            <div class="d-flex justify-content-between align-items-center creator-card shadow-sm">
+              <div class="d-flex align-items-center gap-3">
+                <div class="avatar-sm">
+                  {{ author.username.charAt(0).toUpperCase() }}
+                </div>
+                <div>
+                  <h6 class="creator-name mb-0">{{ author.username }}</h6>
+                  <small class="text-muted fw-bold">@{{ author.username }}</small>
+                </div>
               </div>
-              <div>
-                <h6 class="mb-0 fw-bold">{{ author.username }}</h6>
-                <small class="text-muted">&#64;{{ author.username }}</small>
-              </div>
+              <button *ngIf="currentUser() && author.id !== currentUser()!.id" class="btn btn-sm fw-bold" [class.btn-primary]="!isFollowing(author.id)" [class.btn-outline-primary]="isFollowing(author.id)" (click)="toggleFollow(author.id)">
+                {{ isFollowing(author.id) ? 'UNFOLLOW' : 'FOLLOW' }}
+              </button>
             </div>
-            <button *ngIf="currentUser() && author.id !== currentUser()!.id" class="btn btn-sm" [class.btn-primary]="!isFollowing(author.id)" [class.btn-outline-primary]="isFollowing(author.id)" (click)="toggleFollow(author.id)">
-              {{ isFollowing(author.id) ? 'Unfollow' : 'Follow' }}
-            </button>
-          </div>
+          }
         </div>
-        
-        <p *ngIf="!loading() && !authors().length" class="text-muted small text-center py-4">No creators found yet.</p>
       </div>
     </aside>
 
     <!-- Trending Posts -->
     <main class="col-lg-8">
-      <h5 class="fw-bold mb-4 d-flex align-items-center">
-        <i class="bi bi-fire text-danger me-2"></i>Trending Now
+      <h5 class="section-label">
+        <i class="bi bi-fire text-danger"></i>TRENDING POSTS
       </h5>
 
       <div *ngIf="loading()" class="text-center py-5"><span class="spinner-border text-primary"></span></div>
 
       <div class="posts-list d-grid gap-4" *ngIf="posts().length">
-        <article class="card p-4 border-0 shadow-sm" *ngFor="let post of posts()">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="d-flex align-items-center gap-2">
-              <span class="fw-bold">{{ post.authorUsername }}</span>
-              <span class="text-muted small">&middot; {{ formatDate(post.createdAt) }}</span>
+        @for (post of posts(); track post.id) {
+          <article class="card p-4 intel-card shadow-sm" [routerLink]="['/posts', post.id]" style="cursor: pointer;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div class="d-flex align-items-center gap-2">
+                <span class="post-meta">{{ post.authorUsername }}</span>
+                <span class="post-date">&middot; {{ formatDate(post.createdAt) }}</span>
+              </div>
+              <span class="badge">VIEW POST</span>
             </div>
-            <a class="btn btn-sm btn--ghost rounded-pill px-3" [routerLink]="['/posts', post.id]">Read Journal</a>
-          </div>
-          
-          <p class="mb-0 text-ink-muted" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
-            {{ post.content }}
-          </p>
-        </article>
-      </div>
-
-      <div *ngIf="!loading() && !posts().length" class="text-center py-5">
-        <p class="text-muted">Explore feed is empty. Start posting to see updates!</p>
+            
+            <p class="mb-0 post-content fw-bold">
+              {{ post.content }}
+            </p>
+          </article>
+        }
       </div>
     </main>
   </div>

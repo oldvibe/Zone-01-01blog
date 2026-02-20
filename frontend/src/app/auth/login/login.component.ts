@@ -1,23 +1,24 @@
-import { Component } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../auth.service';
-import { NgIf } from '@angular/common';
-import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [NgIf, ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
 
   form: FormGroup;
-  errorMessage = '';
-  showPassword = false;
-  submitting = false;
+  errorMessage = signal('');
+  successMessage = signal('');
+  showPassword = signal(false);
+  submitting = signal(false);
+
+  private route = inject(ActivatedRoute);
 
   constructor(
     private fb: FormBuilder,
@@ -27,6 +28,13 @@ export class LoginComponent {
     if (this.authService.isLoggedIn()) {
       this.router.navigate(['/posts']);
     }
+
+    this.route.queryParams.subscribe(params => {
+      if (params['registered'] === 'true') {
+        this.successMessage.set('Account created successfully! Please sign in.');
+      }
+    });
+
     // form initialization
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -37,30 +45,31 @@ export class LoginComponent {
 
   login() {
     if (this.form.invalid) {
-      this.errorMessage = 'Please enter a valid email and password.';
+      this.errorMessage.set('Please enter a valid email and password.');
       this.form.markAllAsTouched();
       return;
     }
 
-    this.errorMessage = '';
-    this.submitting = true;
+    this.errorMessage.set('');
+    this.submitting.set(true);
     const { email, password, remember } = this.form.value;
     
     this.authService.login({ email, password }, remember)
       .subscribe({
         next: () => {
-          this.submitting = false;
+          this.submitting.set(false);
           this.router.navigate(['/posts']);
         },
         error: (err) => {
-          this.submitting = false;
-          this.errorMessage = 'Invalid email or password';
+          this.submitting.set(false);
+          this.errorMessage.set('Invalid email or password');
           console.error(err);
         }
       });
   }
 
   togglePassword() {
-    this.showPassword = !this.showPassword;
+    this.showPassword.update(v => !v);
   }
 }
+

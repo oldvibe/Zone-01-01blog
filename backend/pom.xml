@@ -16,8 +16,8 @@
     <groupId>com.blog01</groupId>
     <artifactId>backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>01Blog Backend</name>
-    <description>Backend for 01Blog social blogging platform</description>
+    <name>AnimeBlog Backend</name>
+    <description>Backend for AnimeBlog social blogging platform</description>
 
     <properties>
         <java.version>17</java.version>

@@ -12,6 +12,8 @@ services:
       - DB_DRIVER=org.postgresql.Driver
       - DB_USER=postgres
       - DB_PASSWORD=postgres
+    volumes:
+      - uploads_data:/app/uploads
     networks:
       - blog-net
 
@@ -53,3 +55,4 @@ networks:
 
 volumes:
   postgres_data:
+  uploads_data:

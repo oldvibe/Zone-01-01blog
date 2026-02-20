@@ -1,44 +1,46 @@
 <section class="notifications-page container py-5">
   <div class="row justify-content-center">
-    <div class="col-lg-8">
+    <div class="col-lg-9">
       <header class="mb-5 d-flex justify-content-between align-items-end">
         <div>
-          <p class="text-primary fw-bold text-uppercase tracking-wider small mb-2">Activities</p>
-          <h1 class="fw-bold mb-0">Notifications</h1>
+          <p class="text-primary fw-bold text-uppercase tracking-wider small mb-2">ACTIVITY FEED</p>
+          <h1 class="section-title mb-0">NOTIFICATIONS</h1>
         </div>
-        <div class="small text-muted" *ngIf="items().length">
-          {{ items().length }} total updates
+        <div class="small text-muted fw-bold" *ngIf="items().length">
+          {{ items().length }} ALERTS
         </div>
       </header>
 
       <div *ngIf="loading()" class="text-center py-5"><span class="spinner-border text-primary"></span></div>
       
-      <div class="alert alert-danger" *ngIf="errorMessage()">{{ errorMessage() }}</div>
+      <div class="status-msg error" *ngIf="errorMessage()">{{ errorMessage() }}</div>
 
       <div class="notifications-list d-grid gap-3" *ngIf="items().length">
-        <article class="card p-4 border-0 shadow-sm" *ngFor="let item of items()" [class.opacity-75]="item.read" [style.border-left]="item.read ? 'none' : '4px solid var(--primary)'">
-          <div class="d-flex justify-content-between align-items-center gap-4">
-            <div class="d-flex align-items-start gap-3">
-              <div class="icon-wrap bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-grid place-items-center" style="width: 40px; height: 40px;">
-                <i class="bi bi-lightning-charge"></i>
+        @for (item of items(); track item.id) {
+          <article class="card p-4 border-0 notification-card" [class.unread]="!item.read" [class.opacity-75]="item.read">
+            <div class="d-flex justify-content-between align-items-center gap-4">
+              <div class="d-flex align-items-start gap-4">
+                <div class="icon-wrap">
+                  <i class="bi bi-lightning-charge"></i>
+                </div>
+                <div>
+                  <p class="mb-1 message">{{ item.message }}</p>
+                  <small class="text-muted uppercase tracking-wider" style="font-size: 0.7rem;">{{ item.createdAt | date:'medium' }}</small>
+                </div>
               </div>
-              <div>
-                <p class="mb-1 fw-medium text-ink">{{ item.message }}</p>
-                <small class="text-muted">{{ item.createdAt | date:'medium' }}</small>
-              </div>
+              
+              <button class="btn btn-sm fw-bold" [class.btn--ghost]="item.read" [class.btn-primary]="!item.read" [disabled]="item.read" (click)="markRead(item.id)">
+                <i class="bi" [class.bi-check2-circle]="item.read" [class.bi-check2]="!item.read"></i>
+                {{ item.read ? 'READ' : 'MARK' }}
+              </button>
             </div>
-            
-            <button class="btn btn-sm" [class.btn--ghost]="item.read" [class.btn-primary]="!item.read" [disabled]="item.read" (click)="markRead(item.id)">
-              <i class="bi" [class.bi-check2-circle]="item.read" [class.bi-check2]="!item.read"></i>
-              {{ item.read ? 'Read' : 'Mark' }}
-            </button>
-          </div>
-        </article>
+          </article>
+        }
       </div>
 
-      <div *ngIf="!loading() && !items().length" class="text-center py-5 bg-white rounded-4 border">
+      <div *ngIf="!loading() && !items().length" class="text-center py-5">
         <div class="display-1 text-muted opacity-10 mb-3"><i class="bi bi-bell-slash"></i></div>
-        <p class="text-muted">No new notifications.</p>
+        <p class="text-muted">No new activity signals detected.</p>
       </div>
     </div>
   </div>

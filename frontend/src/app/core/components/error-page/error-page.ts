@@ -7,43 +7,174 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <div class="error-container d-flex align-items-center justify-content-center min-vh-100 bg-light p-4">
-      <div class="error-card text-center card p-5 shadow-lg border-0" style="max-width: 500px; border-radius: 24px;">
-        <div class="error-icon-wrap mb-4 mx-auto" [ngClass]="typeClass">
-          <i class="bi" [ngClass]="iconClass"></i>
-        </div>
-        <h1 class="display-4 fw-bold mb-2">{{ title }}</h1>
-        <h3 class="h5 text-muted mb-4">{{ subtitle }}</h3>
-        <p class="text-secondary mb-5">{{ description }}</p>
-        <div class="d-grid gap-2">
-          <a routerLink="/" class="btn btn-primary py-3 rounded-pill fw-bold">
-            <i class="bi bi-house-door me-2"></i>Back to Safety
-          </a>
-        </div>
+    <div class="error-page-wrapper">
+      <div class="parallax-bg" [style.background-image]="backgroundImage"></div>
+      <div class="overlay-gradient"></div>
+
+      <div class="content-wrapper">
+        <main class="error-glass-container">
+          <div class="error-card-glass">
+            <div class="card-glow" [ngClass]="typeClass"></div>
+            
+            <header class="error-header">
+              <span class="badge-pill" [ngClass]="typeClass">System Alert: {{ title }}</span>
+              <h1 class="display-title">{{ subtitle }}</h1>
+              <p class="description">{{ description }}</p>
+            </header>
+
+            <div class="action-zone">
+              <a routerLink="/" class="btn-anime-primary">
+                <i class="bi bi-house-door"></i>
+                <span>Return to Hub</span>
+              </a>
+            </div>
+          </div>
+        </main>
       </div>
     </div>
   `,
   styles: [`
-    .error-icon-wrap {
-      width: 100px;
-      height: 100px;
-      display: grid;
-      place-items: center;
-      font-size: 3rem;
-      border-radius: 50%;
+    .error-page-wrapper {
+      position: relative;
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #020617;
+      font-family: 'Space Grotesk', sans-serif;
     }
-    .bg-soft-warning { background-color: #fff3cd; color: #856404; }
-    .bg-soft-danger { background-color: #f8d7da; color: #721c24; }
-    .bg-soft-primary { background-color: #cfe2ff; color: #084298; }
+
+    .parallax-bg {
+      position: absolute;
+      inset: -20px;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(1.2) brightness(0.6);
+      z-index: 1;
+      animation: backgroundPan 30s linear infinite;
+    }
+
+    .overlay-gradient {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, transparent 0%, rgba(2, 6, 23, 0.8) 100%),
+                  linear-gradient(to bottom, rgba(99, 102, 241, 0.1) 0%, transparent 100%);
+      z-index: 2;
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .error-glass-container {
+      width: 100%;
+      max-width: 520px;
+      animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .error-card-glass {
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 2rem;
+      padding: 4rem 3rem;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-glow {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 4px;
+      background: var(--primary-gradient);
+      &.danger { background: linear-gradient(90deg, #ef4444, #f87171); }
+    }
+
+    .badge-pill {
+      display: inline-block;
+      padding: 0.35rem 1.25rem;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: var(--primary);
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 2rem;
+      &.danger {
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.1);
+        border-color: rgba(239, 68, 68, 0.3);
+      }
+    }
+
+    .display-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: #ffffff;
+      margin-bottom: 1rem;
+      letter-spacing: -1px;
+    }
+
+    .description {
+      font-size: 1.1rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin-bottom: 3rem;
+    }
+
+    .btn-anime-primary {
+      width: 100%;
+      height: 64px;
+      background: var(--primary-gradient);
+      border: none;
+      border-radius: 16px;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      text-decoration: none;
+      transition: all 0.3s;
+      box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+
+      &:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 20px 30px -10px rgba(99, 102, 241, 0.6);
+      }
+    }
+
+    @keyframes backgroundPan {
+      from { transform: scale(1.1) translate(0, 0); }
+      50% { transform: scale(1.1) translate(-20px, -20px); }
+      to { transform: scale(1.1) translate(0, 0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   `]
 })
 export class ErrorPage implements OnInit {
   type: string = '404';
   title: string = '404';
-  subtitle: string = 'Page Not Found';
-  description: string = "Oops! The page you're looking for doesn't exist or has been moved.";
-  iconClass: string = 'bi-exclamation-triangle-fill';
-  typeClass: string = 'bg-soft-warning';
+  subtitle: string = 'Out of Bounds';
+  description: string = "Neural link broken. The coordinate you're seeking doesn't exist in our hub.";
+  backgroundImage: string = "url('assets/404error.jpg')";
+  typeClass: string = 'warning';
 
   constructor(private route: ActivatedRoute) {}
 
@@ -58,24 +189,24 @@ export class ErrorPage implements OnInit {
     switch (this.type) {
       case '404':
         this.title = '404';
-        this.subtitle = 'Page Not Found';
-        this.description = "We couldn't find the page you're looking for.";
-        this.iconClass = 'bi-search';
-        this.typeClass = 'bg-soft-warning';
+        this.subtitle = 'Coordinate Lost';
+        this.description = "The intel you're seeking has been moved or purged from the neural network.";
+        this.backgroundImage = "url('assets/404error.jpg')";
+        this.typeClass = 'warning';
         break;
       case '500':
         this.title = '500';
-        this.subtitle = 'Server Error';
-        this.description = "Something went wrong on our end. We're working on it!";
-        this.iconClass = 'bi-gear-wide-connected';
-        this.typeClass = 'bg-soft-danger';
+        this.subtitle = 'System Crash';
+        this.description = "Critical hub failure detected. Our technicians are currently stabilizing the reactor.";
+        this.backgroundImage = "url('assets/login.jpg')";
+        this.typeClass = 'danger';
         break;
       case '403':
         this.title = '403';
         this.subtitle = 'Access Denied';
-        this.description = "You don't have permission to view this resource.";
-        this.iconClass = 'bi-shield-lock-fill';
-        this.typeClass = 'bg-soft-danger';
+        this.description = "Your identity protocol does not have clearance for this high-level intel sector.";
+        this.backgroundImage = "url('assets/register.jpg')";
+        this.typeClass = 'danger';
         break;
     }
   }
