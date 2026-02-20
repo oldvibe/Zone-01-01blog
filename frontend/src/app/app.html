@@ -30,10 +30,41 @@
   </nav>
 
   <!-- Mobile Nav Trigger -->
-  <button class="btn btn--ghost d-lg-none" *ngIf="isLoggedIn()">
-    <i class="bi bi-list h4 mb-0"></i>
+  <button class="btn btn--ghost d-lg-none" *ngIf="isLoggedIn()" (click)="toggleMobileMenu()">
+    <i class="bi" [class.bi-list]="!mobileMenuOpen()" [class.bi-x-lg]="mobileMenuOpen()" style="font-size: 1.5rem;"></i>
   </button>
 </header>
+
+<!-- Mobile Menu Overlay -->
+<div class="mobile-menu d-lg-none" [class.is-open]="mobileMenuOpen()" *ngIf="isLoggedIn()">
+  <div class="menu-backdrop" (click)="toggleMobileMenu()"></div>
+  <nav class="menu-content card p-4">
+    <div class="brand-font h5 mb-4 text-center">MENU</div>
+    <div class="d-grid gap-3">
+      <a routerLink="/posts" routerLinkActive="is-active" class="nav-link">
+        <i class="bi bi-postcard-heart-fill me-2"></i> FEED
+      </a>
+      <a routerLink="/explore" routerLinkActive="is-active" class="nav-link">
+        <i class="bi bi-compass-fill me-2"></i> EXPLORE
+      </a>
+      <a routerLink="/notifications" routerLinkActive="is-active" class="nav-link">
+        <i class="bi bi-bell-fill me-2"></i> NOTIFICATIONS
+        <span *ngIf="unreadCount() > 0" class="badge ms-2">{{ unreadCount() }}</span>
+      </a>
+      <a routerLink="/profile" routerLinkActive="is-active" class="nav-link">
+        <i class="bi bi-person-circle me-2"></i> PROFILE
+      </a>
+      <a routerLink="/settings" routerLinkActive="is-active" class="nav-link">
+        <i class="bi bi-gear-fill me-2"></i> SETTINGS
+      </a>
+      <hr class="my-2 opacity-10">
+      <a *ngIf="isAdmin()" routerLink="/admin" class="btn btn-danger w-100">ADMIN PANEL</a>
+      <button (click)="logout()" class="btn btn--ghost text-danger w-100 fw-bold">
+        LOGOUT
+      </button>
+    </div>
+  </nav>
+</div>
 
 <main class="app-main">
   <router-outlet />

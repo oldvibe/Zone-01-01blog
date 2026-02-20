@@ -16,6 +16,7 @@ export class App implements OnInit {
   protected readonly title = signal('frontend');
   isAdmin = signal(false);
   unreadCount = signal(0);
+  mobileMenuOpen = signal(false);
   
   private authService = inject(AuthService);
   isLoggedIn = this.authService.isLoggedIn;
@@ -34,6 +35,15 @@ export class App implements OnInit {
         this.unreadCount.set(0);
       }
     });
+
+    // Close menu on navigation
+    this.router.events.subscribe(() => {
+      this.mobileMenuOpen.set(false);
+    });
+  }
+
+  toggleMobileMenu() {
+    this.mobileMenuOpen.update(v => !v);
   }
 
   ngOnInit() {

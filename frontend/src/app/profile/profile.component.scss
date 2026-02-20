@@ -31,7 +31,11 @@
 
 .profile-banner {
   height: 240px;
-  background: linear-gradient(to bottom, rgba(99, 102, 241, 0.2), var(--bg));
+  background: 
+    linear-gradient(to bottom, rgba(99, 102, 241, 0.3), var(--bg)),
+    url('/assets/sea-bg.gif');
+  background-size: cover;
+  background-position: center;
   border-bottom: 1px solid var(--border);
 }
 
