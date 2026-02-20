@@ -1,23 +1,22 @@
 <section class="posts-shell container py-5">
-  <div class="row g-4">
-    <!-- Left Sidebar: Profile Summary -->
-    <aside class="col-lg-3 d-none d-lg-block">
-      <div class="card p-4 sticky-top side-widget" style="top: 100px;">
+  <div class="row g-4 justify-content-center">
+    <!-- Left Sidebar: Dashboard -->
+    <aside class="col-lg-2 d-none d-lg-block">
+      <div class="card p-3 sticky-top side-widget shadow-sm" style="top: 100px; border-radius: 1.5rem;">
         <div class="text-center mb-4">
-          <div class="avatar-placeholder mx-auto mb-3 shadow-lg">
-            <i class="bi bi-person-fill h2 mb-0"></i>
+          <div class="avatar-placeholder mx-auto mb-3 shadow-lg" style="width: 60px; height: 60px;">
+            <i class="bi bi-person-fill h3 mb-0"></i>
           </div>
-          <h5 class="fw-bold mb-1 brand-font">DASHBOARD</h5>
-          <p class="text-muted small fw-bold">ONLINE STATUS: ACTIVE</p>
+          <h6 class="fw-bold mb-1 brand-font" style="font-size: 0.75rem;">DASHBOARD</h6>
         </div>
         <div class="d-grid gap-2">
-          <a routerLink="/profile" class="btn btn--ghost justify-content-start fw-bold">
-            <i class="bi bi-person-circle me-2"></i>MY PROFILE
+          <a routerLink="/profile" class="btn btn-sm btn--ghost justify-content-start fw-bold" style="font-size: 0.7rem; padding: 0.6rem;">
+            <i class="bi bi-person-circle me-2"></i>PROFILE
           </a>
-          <a routerLink="/settings" class="btn btn--ghost justify-content-start fw-bold">
-            <i class="bi bi-gear-wide-connected me-2"></i>SETTINGS
+          <a routerLink="/settings" class="btn btn-sm btn--ghost justify-content-start fw-bold" style="font-size: 0.7rem; padding: 0.6rem;">
+            <i class="bi bi-gear-fill me-2"></i>SETTINGS
           </a>
-          <button class="btn btn--ghost justify-content-start text-danger fw-bold" (click)="logout()">
+          <button class="btn btn-sm btn--ghost justify-content-start text-danger fw-bold" style="font-size: 0.7rem; padding: 0.6rem;" (click)="logout()">
             <i class="bi bi-box-arrow-right me-2"></i>LOGOUT
           </button>
         </div>
@@ -25,7 +24,7 @@
     </aside>
 
     <!-- Main Feed -->
-    <main class="col-lg-6">
+    <main class="col-lg-7">
       <!-- Feed Switch -->
       <div class="feed-switch mb-4 shadow-sm">
         <button type="button" class="btn fw-bold" [class.is-active]="feedMode() === 'public'" (click)="setMode('public')">
@@ -148,23 +147,21 @@
     </main>
 
     <!-- Right Sidebar -->
-    <aside class="col-lg-3">
-      <div class="card p-4 mb-4 side-widget shadow-sm">
-        <h6 class="brand-font text-primary">HUB INFO</h6>
-        <div class="small text-white fw-bold mb-3">Welcome to AnimeBlog. Share your passion.</div>
+    <aside class="col-lg-3 d-none d-xl-block">
+      <div class="card p-4 mb-4 side-widget shadow-sm" style="border-radius: 1.5rem;">
+        <h6 class="brand-font text-primary" style="font-size: 0.8rem;">HUB INFO</h6>
+        <div class="small text-white fw-bold mb-3">AnimeHub: Share your passion for the anime world.</div>
         <ul class="list-unstyled d-grid gap-2 mb-0">
-          <li class="small text-white fw-bold"><i class="bi bi-stars text-primary me-2"></i> POST CONTENT</li>
-          <li class="small text-white fw-bold"><i class="bi bi-stars text-primary me-2"></i> FOLLOW PEERS</li>
-          <li class="small text-white fw-bold"><i class="bi bi-stars text-primary me-2"></i> GET INSPIRED</li>
+          <li class="small text-white fw-bold"><i class="bi bi-stars text-primary me-2"></i> SHARE MOMENTS</li>
+          <li class="small text-white fw-bold"><i class="bi bi-stars text-primary me-2"></i> FOLLOW FANS</li>
         </ul>
       </div>
       
-      <div class="card p-4 side-widget shadow-sm">
-        <h6 class="brand-font text-primary">GUIDELINES</h6>
+      <div class="card p-4 side-widget shadow-sm" style="border-radius: 1.5rem;">
+        <h6 class="brand-font text-primary" style="font-size: 0.8rem;">GUIDELINES</h6>
         <div class="small text-white fw-bold">
           1. BE RESPECTFUL<br>
-          2. NO SPAM<br>
-          3. PASSION ONLY
+          2. PASSION ONLY
         </div>
       </div>
     </aside>

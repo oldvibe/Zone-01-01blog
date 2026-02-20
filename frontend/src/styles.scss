@@ -187,3 +187,43 @@ p, span, .post-body, .comment-content {
 .text-muted {
   color: #94a3b8 !important;
 }
+
+// Professional Media Layout
+.media-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 1.5rem 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  
+  img, video {
+    width: 100%;
+    height: auto;
+    max-height: 700px;
+    object-fit: contain;
+    background: #000;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: var(--radius);
+    
+    &:hover { 
+      filter: brightness(1.1);
+    }
+  }
+}
+
+.container {
+  max-width: 1300px !important;
+  margin: 0 auto;
+}
+
+.row {
+  justify-content: center;
+}
+
+.app-main {
+  padding-top: 2rem;
+  padding-bottom: 5rem;
+}
