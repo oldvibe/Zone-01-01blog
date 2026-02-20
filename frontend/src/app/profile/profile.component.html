@@ -11,13 +11,13 @@
       
       <div class="d-flex flex-wrap justify-content-between align-items-end mt-n5 pt-4 pt-lg-0 ms-lg-5 ps-lg-5">
         <div class="ms-lg-4 mt-2">
-          <h1 class="fw-bold h2 mb-1">{{ user?.username }}</h1>
-          <p class="text-muted mb-0"><i class="bi bi-envelope me-2"></i>{{ user?.email }}</p>
+          <h1 class="fw-bold h2 mb-1">{{ user()?.username }}</h1>
+          <p class="text-muted mb-0"><i class="bi bi-envelope me-2"></i>{{ user()?.email }}</p>
         </div>
         
         <div class="d-flex gap-2 mt-3">
-          <ng-container *ngIf="!isMe && canFollowViewedUser()">
-            <button class="btn" [class.btn-primary]="!isFollowingViewedUser()" [class.btn-outline-primary]="isFollowingViewedUser()" (click)="toggleFollow(user!.id)">
+          <ng-container *ngIf="!isMe() && canFollowViewedUser()">
+            <button class="btn" [class.btn-primary]="!isFollowingViewedUser()" [class.btn-outline-primary]="isFollowingViewedUser()" (click)="toggleFollow(user()!.id)">
               <i class="bi" [class.bi-person-plus]="!isFollowingViewedUser()" [class.bi-person-dash]="isFollowingViewedUser()"></i>
               {{ isFollowingViewedUser() ? 'Unfollow' : 'Follow' }}
             </button>
@@ -25,7 +25,7 @@
               <i class="bi bi-flag me-2"></i>Report
             </button>
           </ng-container>
-          <a *ngIf="isMe" routerLink="/settings" class="btn btn--ghost">
+          <a *ngIf="isMe()" routerLink="/settings" class="btn btn--ghost">
             <i class="bi bi-pencil me-2"></i>Edit Profile
           </a>
         </div>
@@ -33,15 +33,15 @@
 
       <div class="d-flex gap-4 mt-4 border-top pt-4">
         <div class="text-center">
-          <span class="d-block fw-bold h5 mb-0">{{ posts.length }}</span>
+          <span class="d-block fw-bold h5 mb-0">{{ posts().length }}</span>
           <small class="text-muted text-uppercase fw-bold tracking-wider" style="font-size: 0.65rem;">Posts</small>
         </div>
         <div class="text-center">
-          <span class="d-block fw-bold h5 mb-0">{{ followers.length }}</span>
+          <span class="d-block fw-bold h5 mb-0">{{ followers().length }}</span>
           <small class="text-muted text-uppercase fw-bold tracking-wider" style="font-size: 0.65rem;">Followers</small>
         </div>
         <div class="text-center">
-          <span class="d-block fw-bold h5 mb-0">{{ following.length }}</span>
+          <span class="d-block fw-bold h5 mb-0">{{ following().length }}</span>
           <small class="text-muted text-uppercase fw-bold tracking-wider" style="font-size: 0.65rem;">Following</small>
         </div>
       </div>
@@ -50,16 +50,16 @@
 
   <div class="row g-4">
     <!-- Sidebar: Social Info -->
-    <aside class="col-lg-4" *ngIf="isMe">
+    <aside class="col-lg-4" *ngIf="isMe()">
       <div class="d-grid gap-4">
         <section class="card p-4">
           <h5 class="fw-bold mb-3">Followers</h5>
-          <div *ngIf="followersLoading" class="text-center py-3 text-muted"><span class="spinner-border spinner-border-sm"></span></div>
-          <div *ngIf="!followersLoading && !followers.length" class="text-center py-3 text-muted small">No followers yet.</div>
+          <div *ngIf="followersLoading()" class="text-center py-3 text-muted"><span class="spinner-border spinner-border-sm"></span></div>
+          <div *ngIf="!followersLoading() && !followers().length" class="text-center py-3 text-muted small">No followers yet.</div>
           <div class="d-grid gap-2">
-            <div *ngFor="let f of followers" class="d-flex justify-content-between align-items-center p-2 rounded-3 bg-light border border-white">
+            <div *ngFor="let f of followers()" class="d-flex justify-content-between align-items-center p-2 rounded-3 bg-light border border-white">
               <span class="fw-medium small">{{ f.username }}</span>
-              <button *ngIf="viewer && f.id !== viewer.id" class="btn btn-sm btn-link text-primary p-0 text-decoration-none" (click)="toggleFollow(f.id)">
+              <button *ngIf="viewer() && f.id !== viewer()!.id" class="btn btn-sm btn-link text-primary p-0 text-decoration-none" (click)="toggleFollow(f.id)">
                 {{ isFollowingUser(f.id) ? 'Unfollow' : 'Follow' }}
               </button>
             </div>
@@ -68,12 +68,12 @@
 
         <section class="card p-4">
           <h5 class="fw-bold mb-3">Following</h5>
-          <div *ngIf="followingLoading" class="text-center py-3 text-muted"><span class="spinner-border spinner-border-sm"></span></div>
-          <div *ngIf="!followingLoading && !following.length" class="text-center py-3 text-muted small">Not following anyone.</div>
+          <div *ngIf="followingLoading()" class="text-center py-3 text-muted"><span class="spinner-border spinner-border-sm"></span></div>
+          <div *ngIf="!followingLoading() && !following().length" class="text-center py-3 text-muted small">Not following anyone.</div>
           <div class="d-grid gap-2">
-            <div *ngFor="let f of following" class="d-flex justify-content-between align-items-center p-2 rounded-3 bg-light border border-white">
+            <div *ngFor="let f of following()" class="d-flex justify-content-between align-items-center p-2 rounded-3 bg-light border border-white">
               <span class="fw-medium small">{{ f.username }}</span>
-              <button *ngIf="viewer && f.id !== viewer.id" class="btn btn-sm btn-link text-danger p-0 text-decoration-none" (click)="toggleFollow(f.id)">Unfollow</button>
+              <button *ngIf="viewer() && f.id !== viewer()!.id" class="btn btn-sm btn-link text-danger p-0 text-decoration-none" (click)="toggleFollow(f.id)">Unfollow</button>
             </div>
           </div>
         </section>
@@ -81,25 +81,25 @@
     </aside>
 
     <!-- Main Profile Content -->
-    <main [class.col-lg-8]="isMe" [class.col-lg-12]="!isMe">
-      <h4 class="fw-bold mb-4">{{ isMe ? 'My Feed' : 'Journal Entries' }}</h4>
+    <main [class.col-lg-8]="isMe()" [class.col-lg-12]="!isMe()">
+      <h4 class="fw-bold mb-4">{{ isMe() ? 'My Feed' : 'Journal Entries' }}</h4>
       
-      <div *ngIf="reporting" class="card p-4 mb-4 border-danger border-opacity-25">
+      <div *ngIf="reporting()" class="card p-4 mb-4 border-danger border-opacity-25">
         <h5 class="fw-bold mb-2">Report Profile</h5>
         <form [formGroup]="reportForm" (ngSubmit)="submitReport()">
           <textarea rows="3" class="form-control mb-3" placeholder="Please provide details about the inappropriate content..." formControlName="reason"></textarea>
           <div class="d-flex gap-2">
             <button type="submit" class="btn btn-danger px-4">Submit Report</button>
-            <button type="button" class="btn btn--ghost" (click)="reporting = false">Cancel</button>
+            <button type="button" class="btn btn--ghost" (click)="reporting.set(false)">Cancel</button>
           </div>
-          <p *ngIf="reportMessage" class="small text-success mt-3 mb-0 fw-bold">{{ reportMessage }}</p>
+          <p *ngIf="reportMessage()" class="small text-success mt-3 mb-0 fw-bold">{{ reportMessage() }}</p>
         </form>
       </div>
 
-      <div *ngIf="postsLoading" class="text-center py-5"><span class="spinner-border text-primary"></span></div>
+      <div *ngIf="postsLoading()" class="text-center py-5"><span class="spinner-border text-primary"></span></div>
 
-      <div class="posts-list d-grid gap-4" *ngIf="posts.length">
-        <article class="card p-4" *ngFor="let post of posts">
+      <div class="posts-list d-grid gap-4" *ngIf="posts().length">
+        <article class="card p-4" *ngFor="let post of posts()">
           <div class="post-content mb-3" style="white-space: pre-wrap; cursor: pointer;" [routerLink]="['/posts', post.id]">{{ post.content }}</div>
           
           <div class="media-grid" *ngIf="post.mediaUrls?.length" style="cursor: pointer;" [routerLink]="['/posts', post.id]">
@@ -113,7 +113,7 @@
             <span class="text-muted smaller fw-medium">{{ formatDate(post.createdAt) }}</span>
             <div class="d-flex gap-2">
               <a class="btn btn-sm btn--ghost" [routerLink]="['/posts', post.id]">View All</a>
-              <button class="btn btn-sm btn--ghost text-danger" *ngIf="isMe" (click)="deletePost(post.id)">
+              <button class="btn btn-sm btn--ghost text-danger" *ngIf="isMe()" (click)="deletePost(post.id)">
                 <i class="bi bi-trash"></i>
               </button>
             </div>
@@ -121,7 +121,7 @@
         </article>
       </div>
 
-      <div *ngIf="!postsLoading && !posts.length" class="text-center py-5 bg-white rounded-4 border">
+      <div *ngIf="!postsLoading() && !posts().length" class="text-center py-5 bg-white rounded-4 border">
         <div class="display-1 text-muted opacity-10 mb-3"><i class="bi bi-journal-text"></i></div>
         <p class="text-muted">No journal entries yet.</p>
       </div>

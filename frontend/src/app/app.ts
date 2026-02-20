@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { UserService } from './core/services/user.service';
@@ -14,43 +14,44 @@ import { AuthService } from './auth/auth.service';
 })
 export class App implements OnInit {
   protected readonly title = signal('frontend');
-  isAdmin = false;
-  unreadCount = 0;
-  isLoggedIn = false;
+  isAdmin = signal(false);
+  unreadCount = signal(0);
+  isLoggedIn = this.authService.isLoggedIn;
 
   constructor(
     private userService: UserService,
     private notificationService: NotificationService,
     private authService: AuthService,
     private router: Router
-  ) {}
-
-  ngOnInit() {
-    this.authService.isLoggedIn$.subscribe((status) => {
-      this.isLoggedIn = status;
+  ) {
+    effect(() => {
+      const status = this.isLoggedIn();
       if (status) {
         this.loadUserData();
       } else {
-        this.isAdmin = false;
-        this.unreadCount = 0;
+        this.isAdmin.set(false);
+        this.unreadCount.set(0);
       }
+    });
+  }
+
+  ngOnInit() {
+    this.notificationService.unreadCount$.subscribe((count) => {
+      this.unreadCount.set(count);
     });
   }
 
   loadUserData() {
     this.userService.me().subscribe({
       next: (user) => {
-        this.isAdmin = user?.role === 'ROLE_ADMIN' || user?.role === 'ADMIN';
+        this.isAdmin.set(user?.role === 'ROLE_ADMIN' || user?.role === 'ADMIN');
       },
       error: () => {
-        this.isAdmin = false;
+        this.isAdmin.set(false);
         this.authService.logout();
       }
     });
 
-    this.notificationService.unreadCount$.subscribe((count) => {
-      this.unreadCount = count;
-    });
     this.notificationService.refreshUnreadCount().subscribe();
   }
 
@@ -59,3 +60,4 @@ export class App implements OnInit {
     this.router.navigate(['/login']);
   }
 }
+

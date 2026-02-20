@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { AdminService, AdminPost, AdminReport, AdminUser } from '../core/services/admin.service';
@@ -12,27 +12,26 @@ import { UserService } from '../core/services/user.service';
   styleUrls: ['./admin.component.scss']
 })
 export class AdminDashboardComponent implements OnInit {
-  users: AdminUser[] = [];
-  posts: AdminPost[] = [];
-  reports: AdminReport[] = [];
-  currentUser: any = null;
-  loading = false;
-  errorMessage = '';
+  users = signal<AdminUser[]>([]);
+  posts = signal<AdminPost[]>([]);
+  reports = signal<AdminReport[]>([]);
+  currentUser = signal<any>(null);
+  loading = signal(false);
+  errorMessage = signal('');
 
   constructor(
     private adminService: AdminService, 
-    private userService: UserService,
-    private change: ChangeDetectorRef
+    private userService: UserService
   ) {}
 
   ngOnInit() {
-    this.userService.me().subscribe((user: any) => this.currentUser = user);
+    this.userService.me().subscribe((user: any) => this.currentUser.set(user));
     this.loadAll();
   }
 
   loadAll() {
-    this.loading = true;
-    this.errorMessage = '';
+    this.loading.set(true);
+    this.errorMessage.set('');
     
     forkJoin({
       users: this.adminService.getUsers(),
@@ -40,17 +39,15 @@ export class AdminDashboardComponent implements OnInit {
       reports: this.adminService.getReports()
     }).subscribe({
       next: (res) => {
-        this.users = res.users ?? [];
-        this.posts = res.posts ?? [];
-        this.reports = res.reports ?? [];
-        this.loading = false;
-        this.change.markForCheck();
+        this.users.set(res.users ?? []);
+        this.posts.set(res.posts ?? []);
+        this.reports.set(res.reports ?? []);
+        this.loading.set(false);
       },
       error: (err) => {
         console.error(err);
-        this.loading = false;
-        this.errorMessage = 'Failed to load admin data.';
-        this.change.markForCheck();
+        this.loading.set(false);
+        this.errorMessage.set('Failed to load admin data.');
       }
     });
   }
@@ -58,8 +55,7 @@ export class AdminDashboardComponent implements OnInit {
   banUser(id: number) {
     this.adminService.toggleUserBan(id).subscribe({
       next: () => {
-        this.users = this.users.map((u) => (u.id === id ? { ...u, enabled: !u.enabled } : u));
-        this.change.markForCheck();
+        this.users.update(users => users.map((u) => (u.id === id ? { ...u, enabled: !u.enabled } : u)));
       },
       error: (err) => console.error(err)
     });
@@ -67,7 +63,9 @@ export class AdminDashboardComponent implements OnInit {
 
   deleteUser(id: number) {
     this.adminService.deleteUser(id).subscribe({
-      next: () => (this.users = this.users.filter((u) => u.id !== id), this.change.markForCheck()),
+      next: () => {
+        this.users.update(users => users.filter((u) => u.id !== id));
+      },
       error: (err) => console.error(err)
     });
   }
@@ -75,8 +73,7 @@ export class AdminDashboardComponent implements OnInit {
   hidePost(id: number) {
     this.adminService.togglePostVisibility(id).subscribe({
       next: () => {
-        this.posts = this.posts.map((p) => (p.id === id ? { ...p, visible: !p.visible } : p));
-        this.change.markForCheck();
+        this.posts.update(posts => posts.map((p) => (p.id === id ? { ...p, visible: !p.visible } : p)));
       },
       error: (err) => console.error(err)
     });
@@ -84,7 +81,9 @@ export class AdminDashboardComponent implements OnInit {
 
   deletePost(id: number) {
     this.adminService.deletePost(id).subscribe({
-      next: () => (this.posts = this.posts.filter((post) => post.id !== id), this.change.markForCheck()),
+      next: () => {
+        this.posts.update(posts => posts.filter((post) => post.id !== id));
+      },
       error: (err) => console.error(err)
     });
   }
@@ -92,7 +91,7 @@ export class AdminDashboardComponent implements OnInit {
   resolveReport(id: number) {
     this.adminService.resolveReport(id).subscribe({
       next: () => {
-        this.reports = this.reports.map((report) => (report.id === id ? { ...report, resolved: true } : report));
+        this.reports.update(reports => reports.map((report) => (report.id === id ? { ...report, resolved: true } : report)));
       },
       error: (err) => console.error(err)
     });
@@ -100,7 +99,9 @@ export class AdminDashboardComponent implements OnInit {
 
   deleteReport(id: number) {
     this.adminService.deleteReport(id).subscribe({
-      next: () => (this.reports = this.reports.filter((report) => report.id !== id)),
+      next: () => {
+        this.reports.update(reports => reports.filter((report) => report.id !== id));
+      },
       error: (err) => console.error(err)
     });
   }
@@ -125,3 +126,4 @@ export class AdminDashboardComponent implements OnInit {
     return enabled ? 'btn-ban' : 'btn-unban';
   }
 }
+

@@ -24,10 +24,10 @@
           <i class="bi bi-star-fill text-warning me-2"></i>Featured Creators
         </h5>
         
-        <div *ngIf="loading" class="text-center py-4"><span class="spinner-border text-primary"></span></div>
+        <div *ngIf="loading()" class="text-center py-4"><span class="spinner-border text-primary"></span></div>
         
         <div class="creator-list d-grid gap-3">
-          <div *ngFor="let author of authors" class="d-flex justify-content-between align-items-center p-3 rounded-4 bg-light">
+          <div *ngFor="let author of authors()" class="d-flex justify-content-between align-items-center p-3 rounded-4 bg-light">
             <div class="d-flex align-items-center gap-3">
               <div class="avatar-sm bg-white shadow-sm d-grid place-items-center fw-bold text-primary">
                 {{ author.username.charAt(0).toUpperCase() }}
@@ -37,13 +37,13 @@
                 <small class="text-muted">&#64;{{ author.username }}</small>
               </div>
             </div>
-            <button *ngIf="currentUser && author.id !== currentUser.id" class="btn btn-sm" [class.btn-primary]="!isFollowing(author.id)" [class.btn-outline-primary]="isFollowing(author.id)" (click)="toggleFollow(author.id)">
+            <button *ngIf="currentUser() && author.id !== currentUser()!.id" class="btn btn-sm" [class.btn-primary]="!isFollowing(author.id)" [class.btn-outline-primary]="isFollowing(author.id)" (click)="toggleFollow(author.id)">
               {{ isFollowing(author.id) ? 'Unfollow' : 'Follow' }}
             </button>
           </div>
         </div>
         
-        <p *ngIf="!loading && !authors.length" class="text-muted small text-center py-4">No creators found yet.</p>
+        <p *ngIf="!loading() && !authors().length" class="text-muted small text-center py-4">No creators found yet.</p>
       </div>
     </aside>
 
@@ -53,10 +53,10 @@
         <i class="bi bi-fire text-danger me-2"></i>Trending Now
       </h5>
 
-      <div *ngIf="loading" class="text-center py-5"><span class="spinner-border text-primary"></span></div>
+      <div *ngIf="loading()" class="text-center py-5"><span class="spinner-border text-primary"></span></div>
 
-      <div class="posts-list d-grid gap-4" *ngIf="posts.length">
-        <article class="card p-4 border-0 shadow-sm" *ngFor="let post of posts">
+      <div class="posts-list d-grid gap-4" *ngIf="posts().length">
+        <article class="card p-4 border-0 shadow-sm" *ngFor="let post of posts()">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <div class="d-flex align-items-center gap-2">
               <span class="fw-bold">{{ post.authorUsername }}</span>
@@ -71,7 +71,7 @@
         </article>
       </div>
 
-      <div *ngIf="!loading && !posts.length" class="text-center py-5">
+      <div *ngIf="!loading() && !posts().length" class="text-center py-5">
         <p class="text-muted">Explore feed is empty. Start posting to see updates!</p>
       </div>
     </main>

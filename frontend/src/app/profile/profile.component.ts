@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -15,20 +15,20 @@ import { ReportService } from '../core/services/report.service';
   styleUrl: './profile.component.scss'
 })
 export class ProfileComponent implements OnInit {
-  user?: UserProfile;
-  viewer?: UserProfile;
-  viewedUsername: string | null = null;
-  isMe = true;
-  posts: any[] = [];
-  followers: FollowUser[] = [];
-  following: FollowUser[] = [];
-  loading = false;
-  postsLoading = false;
-  followersLoading = false;
-  followingLoading = false;
-  errorMessage = '';
-  reporting = false;
-  reportMessage = '';
+  user = signal<UserProfile | undefined>(undefined);
+  viewer = signal<UserProfile | undefined>(undefined);
+  viewedUsername = signal<string | null>(null);
+  isMe = signal(true);
+  posts = signal<any[]>([]);
+  followers = signal<FollowUser[]>([]);
+  following = signal<FollowUser[]>([]);
+  loading = signal(false);
+  postsLoading = signal(false);
+  followersLoading = signal(false);
+  followingLoading = signal(false);
+  errorMessage = signal('');
+  reporting = signal(false);
+  reportMessage = signal('');
   reportForm: FormGroup;
 
   constructor(
@@ -37,8 +37,7 @@ export class ProfileComponent implements OnInit {
     private postService: PostService,
     private reportService: ReportService,
     private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private change: ChangeDetectorRef
+    private route: ActivatedRoute
   ) {
     this.reportForm = this.fb.group({
       reason: ['', Validators.required]
@@ -54,34 +53,32 @@ export class ProfileComponent implements OnInit {
   }
 
   loadProfile() {
-    this.loading = true;
-    this.errorMessage = '';
-    this.postsLoading = true;
-    this.followersLoading = true;
-    this.followingLoading = true;
-    this.viewedUsername = this.route.snapshot.paramMap.get('username');
+    this.loading.set(true);
+    this.errorMessage.set('');
+    this.postsLoading.set(true);
+    this.followersLoading.set(true);
+    this.followingLoading.set(true);
+    this.viewedUsername.set(this.route.snapshot.paramMap.get('username'));
 
     this.userService.me().subscribe({
       next: (me) => {
-        this.viewer = me;
-        if (this.viewedUsername && this.viewedUsername !== me.username) {
-          this.isMe = false;
-          this.loadOtherProfile(this.viewedUsername);
+        this.viewer.set(me);
+        if (this.viewedUsername() && this.viewedUsername() !== me.username) {
+          this.isMe.set(false);
+          this.loadOtherProfile(this.viewedUsername()!);
         } else {
-          this.isMe = true;
-          this.user = me;
-          this.loading = false;
+          this.isMe.set(true);
+          this.user.set(me);
+          this.loading.set(false);
           this.loadMyExtras();
         }
-        this.change.markForCheck();
       },
       error: (err) => {
-        this.errorMessage = 'Failed to load profile.';
-        this.loading = false;
-        this.postsLoading = false;
-        this.followersLoading = false;
-        this.followingLoading = false;
-        this.change.markForCheck();
+        this.errorMessage.set('Failed to load profile.');
+        this.loading.set(false);
+        this.postsLoading.set(false);
+        this.followersLoading.set(false);
+        this.followingLoading.set(false);
         console.error(err);
       }
     });
@@ -90,17 +87,15 @@ export class ProfileComponent implements OnInit {
   loadOtherProfile(username: string) {
     this.userService.getByUsername(username).subscribe({
       next: (user) => {
-        this.user = user;
-        this.loading = false;
+        this.user.set(user);
+        this.loading.set(false);
         this.loadOtherPosts(username);
-        this.change.markForCheck();
       },
       error: (err) => {
-        this.errorMessage = 'User not found.';
-        this.loading = false;
-        this.postsLoading = false;
+        this.errorMessage.set('User not found.');
+        this.loading.set(false);
+        this.postsLoading.set(false);
         console.error(err);
-        this.change.markForCheck();
       }
     });
   }
@@ -108,14 +103,12 @@ export class ProfileComponent implements OnInit {
   loadOtherPosts(username: string) {
     this.userService.postsByUsername(username).subscribe({
       next: (res) => {
-        this.posts = Array.isArray(res?.content) ? res.content : (res ?? []);
-        this.postsLoading = false;
-        this.change.markForCheck();
+        this.posts.set(Array.isArray(res?.content) ? res.content : (res ?? []));
+        this.postsLoading.set(false);
       },
       error: (err) => {
         console.error(err);
-        this.postsLoading = false;
-        this.change.markForCheck();
+        this.postsLoading.set(false);
       }
     });
   }
@@ -123,115 +116,110 @@ export class ProfileComponent implements OnInit {
   loadMyExtras() {
     this.userService.myPosts().subscribe({
       next: (res) => {
-        this.posts = Array.isArray(res?.content) ? res.content : (res ?? []);
-        this.postsLoading = false;
-        this.change.markForCheck();
+        this.posts.set(Array.isArray(res?.content) ? res.content : (res ?? []));
+        this.postsLoading.set(false);
       },
       error: (err) => {
         console.error(err);
-        this.postsLoading = false;
-        this.change.markForCheck();
+        this.postsLoading.set(false);
       }
     });
 
     this.followService.getFollowers().subscribe({
       next: (res) => {
-        this.followers = res ?? [];
-        this.followersLoading = false;
-        this.change.markForCheck();
+        this.followers.set(res ?? []);
+        this.followersLoading.set(false);
       },
       error: (err) => {
         console.error(err);
-        this.followersLoading = false;
-        this.change.markForCheck();
+        this.followersLoading.set(false);
       }
     });
 
     this.followService.getFollowing().subscribe({
       next: (res) => {
-        this.following = res ?? [];
-        this.followingLoading = false;
-        this.change.markForCheck();
+        this.following.set(res ?? []);
+        this.followingLoading.set(false);
       },
       error: (err) => {
         console.error(err);
-        this.followingLoading = false;
-        this.change.markForCheck();
+        this.followingLoading.set(false);
       }
     });
   }
 
   toggleFollow(userId: number) {
-    if (this.viewer && userId === this.viewer.id) {
+    if (this.viewer() && userId === this.viewer()!.id) {
       return;
     }
-    const isFollowing = this.following.some((user) => user.id === userId);
-    if (isFollowing) {
-      this.following = this.following.filter((user) => user.id !== userId);
-    } else {
-      const user = this.followers.find((follower) => follower.id === userId);
-      if (user) {
-        this.following = [...this.following, user];
+    const isFollowing = this.following().some((user) => user.id === userId);
+    
+    this.following.update(following => {
+      if (isFollowing) {
+        return following.filter((user) => user.id !== userId);
+      } else {
+        const user = this.followers().find((follower) => follower.id === userId);
+        return user ? [...following, user] : following;
       }
-    }
+    });
+
     this.followService.toggleFollow(userId).subscribe({
       next: () => { },
       error: (err) => {
         console.error(err);
-        if (isFollowing) {
-          const user = this.followers.find((follower) => follower.id === userId);
-          if (user) {
-            this.following = [...this.following, user];
+        // Rollback
+        this.following.update(following => {
+          if (isFollowing) {
+            const user = this.followers().find((follower) => follower.id === userId);
+            return user ? [...following, user] : following;
+          } else {
+            return following.filter((user) => user.id !== userId);
           }
-        } else {
-          this.following = this.following.filter((user) => user.id !== userId);
-        }
+        });
       }
     });
   }
 
   isFollowingUser(userId: number) {
-    return this.following.some((user) => user.id === userId);
+    return this.following().some((user) => user.id === userId);
   }
 
   canFollowViewedUser() {
-    if (!this.user || !this.viewer) {
+    if (!this.user() || !this.viewer()) {
       return false;
     }
-    return this.user.id !== this.viewer.id;
+    return this.user()!.id !== this.viewer()!.id;
   }
 
   isFollowingViewedUser() {
-    if (!this.user) {
+    if (!this.user()) {
       return false;
     }
-    return this.following.some((user) => user.id === this.user!.id);
+    return this.following().some((user) => user.id === this.user()!.id);
   }
 
   toggleReport() {
-    this.reporting = !this.reporting;
-    this.reportMessage = '';
+    this.reporting.update(r => !r);
+    this.reportMessage.set('');
     this.reportForm.reset();
   }
 
   submitReport() {
-    if (!this.user?.id || this.reportForm.invalid) {
+    if (!this.user()?.id || this.reportForm.invalid) {
       this.reportForm.markAllAsTouched();
       return;
     }
     const reason = this.reportForm.value.reason;
     this.reportService
-      .create({ reason, targetType: 'USER', targetId: this.user.id })
+      .create({ reason, targetType: 'USER', targetId: this.user()!.id })
       .subscribe({
         next: () => {
-          this.reportMessage = 'Report submitted. Thank you.';
-          this.reporting = false;
-          this.change.markForCheck();
+          this.reportMessage.set('Report submitted. Thank you.');
+          this.reporting.set(false);
         },
         error: (err) => {
           console.error(err);
-          this.reportMessage = 'Failed to submit report.';
-          this.change.markForCheck();
+          this.reportMessage.set('Failed to submit report.');
         }
       });
   }
@@ -239,8 +227,7 @@ export class ProfileComponent implements OnInit {
   deletePost(id: number) {
     this.postService.delete(id).subscribe({
       next: () => {
-        this.posts = this.posts.filter((post) => post.id !== id);
-        this.change.markForCheck();
+        this.posts.update(posts => posts.filter((post) => post.id !== id));
       },
       error: (err) => console.error(err)
     });
@@ -259,3 +246,4 @@ export class ProfileComponent implements OnInit {
     return extensions.some(ext => url.toLowerCase().endsWith(ext));
   }
 }
+

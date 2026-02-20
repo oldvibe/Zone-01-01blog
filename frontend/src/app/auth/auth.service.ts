@@ -1,19 +1,15 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, tap } from 'rxjs';
+import { Injectable, signal, computed } from '@angular/core';
+import { tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
   private api = '/api/auth';
-  private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
-  isLoggedIn$ = this.loggedIn.asObservable();
+  private _isLoggedIn = signal<boolean>(this.hasToken());
+  isLoggedIn = computed(() => this._isLoggedIn());
 
   constructor(private http: HttpClient) {}
-
-  isLoggedIn(): boolean {
-    return this.loggedIn.value;
-  }
 
   private hasToken(): boolean {
     return !!(localStorage.getItem('token') || sessionStorage.getItem('token'));
@@ -27,7 +23,7 @@ export class AuthService {
         } else {
           sessionStorage.setItem('token', res.token);
         }
-        this.loggedIn.next(true);
+        this._isLoggedIn.set(true);
       })
     );
   }
@@ -39,10 +35,11 @@ export class AuthService {
   logout() {
     localStorage.removeItem('token');
     sessionStorage.removeItem('token');
-    this.loggedIn.next(false);
+    this._isLoggedIn.set(false);
   }
 
   updateLoginStatus() {
-    this.loggedIn.next(this.hasToken());
+    this._isLoggedIn.set(this.hasToken());
   }
 }
+

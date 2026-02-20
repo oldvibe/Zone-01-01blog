@@ -6,7 +6,7 @@
     <span class="fw-bold h4 mb-0 tracking-tight" style="color: var(--ink);">01Blog</span>
   </div>
 
-  <nav class="app-nav d-none d-lg-flex align-items-center gap-2" *ngIf="isLoggedIn">
+  <nav class="app-nav d-none d-lg-flex align-items-center gap-2" *ngIf="isLoggedIn()">
     <a routerLink="/posts" routerLinkActive="is-active" class="nav-link">
       <i class="bi bi-house-door me-2"></i>Feed
     </a>
@@ -15,7 +15,7 @@
     </a>
     <a routerLink="/notifications" routerLinkActive="is-active" class="nav-link position-relative">
       <i class="bi bi-bell me-2"></i>Notifications
-      <span *ngIf="unreadCount > 0" class="badge bg-danger position-absolute top-0 start-100 translate-middle p-1 rounded-circle" style="font-size: 0.6rem; min-width: 18px;">{{ unreadCount }}</span>
+      <span *ngIf="unreadCount() > 0" class="badge bg-danger position-absolute top-0 start-100 translate-middle p-1 rounded-circle" style="font-size: 0.6rem; min-width: 18px;">{{ unreadCount() }}</span>
     </a>
     <a routerLink="/profile" routerLinkActive="is-active" class="nav-link">
       <i class="bi bi-person me-2"></i>Profile
@@ -24,19 +24,19 @@
     <a routerLink="/settings" routerLinkActive="is-active" class="nav-link">
       <i class="bi bi-gear"></i>
     </a>
-    <a *ngIf="isAdmin" routerLink="/admin" routerLinkActive="is-active" class="btn btn-sm btn-danger ms-2 px-3">Admin</a>
+    <a *ngIf="isAdmin()" routerLink="/admin" routerLinkActive="is-active" class="btn btn-sm btn-danger ms-2 px-3">Admin</a>
     <button (click)="logout()" class="btn btn--ghost ms-2 text-danger">
       <i class="bi bi-box-arrow-right me-2"></i>Logout
     </button>
   </nav>
 
-  <nav class="app-nav d-flex gap-2" *ngIf="!isLoggedIn">
+  <nav class="app-nav d-flex gap-2" *ngIf="!isLoggedIn()">
     <a routerLink="/login" class="btn btn--ghost px-4">Login</a>
     <a routerLink="/register" class="btn btn-primary px-4">Get Started</a>
   </nav>
 
   <!-- Mobile Nav Trigger (Simple version) -->
-  <button class="btn btn--ghost d-lg-none" *ngIf="isLoggedIn">
+  <button class="btn btn--ghost d-lg-none" *ngIf="isLoggedIn()">
     <i class="bi bi-list h4 mb-0"></i>
   </button>
 </header>

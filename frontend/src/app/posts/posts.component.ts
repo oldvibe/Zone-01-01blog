@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -16,19 +16,19 @@ import { AuthService } from '../auth/auth.service';
   styleUrl: './posts.component.scss'
 })
 export class PostsComponent implements OnInit, OnDestroy {
-  posts: any[] = [];
-  loading = false;
-  errorMessage = '';
+  posts = signal<any[]>([]);
+  loading = signal(false);
+  errorMessage = signal('');
   form: FormGroup;
   reportForm: FormGroup;
-  selectedFiles: File[] = [];
-  mediaPreviews: { url: string; isVideo: boolean }[] = [];
-  mediaPreview: string | null = null;
-  mediaPreviewIsVideo = false;
-  feedMode: 'public' | 'subscriptions' = 'public';
-  followingIds = new Set<number>();
-  reportingPostId: number | null = null;
-  reportMessage = '';
+  selectedFiles = signal<File[]>([]);
+  mediaPreviews = signal<{ url: string; isVideo: boolean }[]>([]);
+  mediaPreview = signal<string | null>(null);
+  mediaPreviewIsVideo = signal(false);
+  feedMode = signal<'public' | 'subscriptions'>('public');
+  followingIds = signal<Set<number>>(new Set());
+  reportingPostId = signal<number | null>(null);
+  reportMessage = signal('');
 
   constructor(
     private postService: PostService,
@@ -37,8 +37,7 @@ export class PostsComponent implements OnInit, OnDestroy {
     private fileService: FileService,
     private authService: AuthService,
     private fb: FormBuilder,
-    private router: Router,
-    private chdr: ChangeDetectorRef,
+    private router: Router
   ) {
     this.form = this.fb.group({
       content: ['', Validators.required]
@@ -56,41 +55,38 @@ export class PostsComponent implements OnInit, OnDestroy {
   loadFollowing() {
     this.followService.getFollowing().subscribe({
       next: (res) => {
-        this.followingIds = new Set((res ?? []).map((user) => user.id));
-        this.chdr.markForCheck();
+        this.followingIds.set(new Set((res ?? []).map((user) => user.id)));
       },
       error: (err) => console.error(err)
     });
   }
 
   setMode(mode: 'public' | 'subscriptions') {
-    if (this.feedMode === mode) {
+    if (this.feedMode() === mode) {
       return;
     }
-    this.feedMode = mode;
+    this.feedMode.set(mode);
     this.loadFeed();
   }
 
   loadFeed(page = 0) {
-    this.loading = true;
-    this.errorMessage = '';
+    this.loading.set(true);
+    this.errorMessage.set('');
 
     const feedRequest =
-      this.feedMode === 'subscriptions'
+      this.feedMode() === 'subscriptions'
         ? this.postService.getSubscriptions(page)
         : this.postService.getFeed(page);
 
     feedRequest.subscribe({
       next: (res) => {
-        this.posts = Array.isArray(res?.content) ? res.content : (res ?? []);
-        this.loading = false;
-        this.chdr.markForCheck();
+        this.posts.set(Array.isArray(res?.content) ? res.content : (res ?? []));
+        this.loading.set(false);
       },
       error: (err) => {
-        this.errorMessage = 'Failed to load posts. Please login first.';
-        this.loading = false;
+        this.errorMessage.set('Failed to load posts. Please login first.');
+        this.loading.set(false);
         console.error(err);
-        this.chdr.markForCheck();
       }
     });
   }
@@ -101,39 +97,39 @@ export class PostsComponent implements OnInit, OnDestroy {
       return;
     }
     
-    const remainingSlots = 3 - this.selectedFiles.length;
+    const remainingSlots = 3 - this.selectedFiles().length;
     if (remainingSlots <= 0) {
-      this.errorMessage = 'You can only upload a maximum of 3 media files.';
+      this.errorMessage.set('You can only upload a maximum of 3 media files.');
       input.value = '';
       return;
     }
 
     const filesToAdd = Array.from(input.files).slice(0, remainingSlots);
     if (input.files.length > remainingSlots) {
-      this.errorMessage = 'Only the first ' + remainingSlots + ' files were added. Max 3 files allowed.';
+      this.errorMessage.set('Only the first ' + remainingSlots + ' files were added. Max 3 files allowed.');
     } else {
-      this.errorMessage = '';
+      this.errorMessage.set('');
     }
 
     filesToAdd.forEach(file => {
-      this.selectedFiles.push(file);
+      this.selectedFiles.update(files => [...files, file]);
       const url = URL.createObjectURL(file);
-      this.mediaPreviews.push({
+      this.mediaPreviews.update(previews => [...previews, {
         url: url,
         isVideo: file.type.startsWith('video')
-      });
+      }]);
     });
     // Reset input to allow selecting same file again if removed
     input.value = '';
   }
 
   removeMedia(index: number) {
-    const removed = this.mediaPreviews.splice(index, 1)[0];
+    const removed = this.mediaPreviews()[index];
     if (removed) {
       URL.revokeObjectURL(removed.url);
+      this.mediaPreviews.update(previews => previews.filter((_, i) => i !== index));
     }
-    this.selectedFiles.splice(index, 1);
-    this.chdr.markForCheck();
+    this.selectedFiles.update(files => files.filter((_, i) => i !== index));
   }
 
   createPost() {
@@ -148,40 +144,37 @@ export class PostsComponent implements OnInit, OnDestroy {
       this.postService.create(content, mediaUrls).subscribe({
         next: (created) => {
           this.form.reset();
-          this.selectedFiles = [];
-          this.mediaPreviews.forEach(p => URL.revokeObjectURL(p.url));
-          this.mediaPreviews = [];
+          this.selectedFiles.set([]);
+          this.mediaPreviews().forEach(p => URL.revokeObjectURL(p.url));
+          this.mediaPreviews.set([]);
           if (created) {
-            this.posts = [created, ...this.posts];
+            this.posts.update(posts => [created, ...posts]);
           } else {
             this.loadFeed();
           }
-          this.chdr.markForCheck();
         },
         error: (err) => {
-          this.errorMessage = 'Failed to create post.';
+          this.errorMessage.set('Failed to create post.');
           console.error(err);
-          this.chdr.markForCheck();
         }
       });
     };
 
-    if (this.selectedFiles.length > 0) {
+    if (this.selectedFiles().length > 0) {
       let uploadedCount = 0;
-      this.selectedFiles.forEach(file => {
+      const files = this.selectedFiles();
+      files.forEach(file => {
         this.fileService.upload(file).subscribe({
           next: (path) => {
             mediaUrls.push(path);
             uploadedCount++;
-            if (uploadedCount === this.selectedFiles.length) {
+            if (uploadedCount === files.length) {
               submit();
             }
-            this.chdr.markForCheck();
           },
           error: (err) => {
-            this.errorMessage = 'Failed to upload media.';
+            this.errorMessage.set('Failed to upload media.');
             console.error(err);
-            this.chdr.markForCheck();
           }
         });
       });
@@ -195,14 +188,34 @@ export class PostsComponent implements OnInit, OnDestroy {
       return;
     }
     const liked = !!post.likedByMe;
-    post.likedByMe = !liked;
-    post.likes = Math.max(0, (post.likes ?? 0) + (liked ? -1 : 1));
+    
+    // Optimistic update in the signal
+    this.posts.update(posts => posts.map(p => {
+      if (p.id === post.id) {
+        return {
+          ...p,
+          likedByMe: !liked,
+          likes: Math.max(0, (p.likes ?? 0) + (liked ? -1 : 1))
+        };
+      }
+      return p;
+    }));
+
     this.postService.like(post.id).subscribe({
       next: () => { },
       error: (err) => {
         console.error(err);
-        post.likedByMe = liked;
-        post.likes = Math.max(0, (post.likes ?? 0) + (liked ? 1 : -1));
+        // Rollback on error
+        this.posts.update(posts => posts.map(p => {
+          if (p.id === post.id) {
+            return {
+              ...p,
+              likedByMe: liked,
+              likes: Math.max(0, (p.likes ?? 0) + (liked ? 1 : -1))
+            };
+          }
+          return p;
+        }));
       }
     });
   }
@@ -211,12 +224,12 @@ export class PostsComponent implements OnInit, OnDestroy {
     if (!post?.id) {
       return;
     }
-    if (this.reportingPostId === post.id) {
-      this.reportingPostId = null;
+    if (this.reportingPostId() === post.id) {
+      this.reportingPostId.set(null);
       return;
     }
-    this.reportingPostId = post.id;
-    this.reportMessage = '';
+    this.reportingPostId.set(post.id);
+    this.reportMessage.set('');
     this.reportForm.reset();
   }
 
@@ -230,15 +243,13 @@ export class PostsComponent implements OnInit, OnDestroy {
       .create({ reason, targetType: 'POST', targetId: post.id })
       .subscribe({
         next: () => {
-          this.reportMessage = 'Report submitted. Thank you.';
-          this.reportingPostId = null;
+          this.reportMessage.set('Report submitted. Thank you.');
+          this.reportingPostId.set(null);
           this.reportForm.reset();
-          this.chdr.markForCheck();
         },
         error: (err) => {
           console.error(err);
-          this.reportMessage = 'Failed to submit report.';
-          this.chdr.markForCheck();
+          this.reportMessage.set('Failed to submit report.');
         }
       });
   }
@@ -247,8 +258,7 @@ export class PostsComponent implements OnInit, OnDestroy {
     if (confirm('Are you sure you want to delete this post?')) {
       this.postService.delete(id).subscribe({
         next: () => {
-          this.posts = this.posts.filter(p => p.id !== id);
-          this.chdr.markForCheck();
+          this.posts.update(posts => posts.filter(p => p.id !== id));
         },
         error: (err) => console.error(err)
       });
@@ -259,27 +269,38 @@ export class PostsComponent implements OnInit, OnDestroy {
     if (!post?.authorId || post?.mine) {
       return;
     }
-    const isFollowing = this.followingIds.has(post.authorId);
-    if (isFollowing) {
-      this.followingIds.delete(post.authorId);
-    } else {
-      this.followingIds.add(post.authorId);
-    }
+    const isFollowing = this.followingIds().has(post.authorId);
+    
+    this.followingIds.update(ids => {
+      const next = new Set(ids);
+      if (isFollowing) {
+        next.delete(post.authorId);
+      } else {
+        next.add(post.authorId);
+      }
+      return next;
+    });
+
     this.followService.toggleFollow(post.authorId).subscribe({
       next: () => { },
       error: (err) => {
         console.error(err);
-        if (isFollowing) {
-          this.followingIds.add(post.authorId);
-        } else {
-          this.followingIds.delete(post.authorId);
-        }
+        // Rollback
+        this.followingIds.update(ids => {
+          const next = new Set(ids);
+          if (isFollowing) {
+            next.add(post.authorId);
+          } else {
+            next.delete(post.authorId);
+          }
+          return next;
+        });
       }
     });
   }
 
   isFollowing(post: any) {
-    return post?.authorId ? this.followingIds.has(post.authorId) : false;
+    return post?.authorId ? this.followingIds().has(post.authorId) : false;
   }
 
   formatDate(value: string) {
@@ -301,11 +322,12 @@ export class PostsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.mediaPreview) {
-      URL.revokeObjectURL(this.mediaPreview);
+    if (this.mediaPreview()) {
+      URL.revokeObjectURL(this.mediaPreview()!);
     }
   }
 }
+
 
 
 

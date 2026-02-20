@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { NotificationService, NotificationItem } from '../core/services/notification.service';
@@ -11,31 +11,29 @@ import { NotificationService, NotificationItem } from '../core/services/notifica
   styleUrl: './notifications.component.scss'
 })
 export class NotificationsComponent implements OnInit {
-  items: NotificationItem[] = [];
-  loading = false;
-  errorMessage = '';
+  items = signal<NotificationItem[]>([]);
+  loading = signal(false);
+  errorMessage = signal('');
 
-  constructor(private notificationService: NotificationService, private change: ChangeDetectorRef) { }
+  constructor(private notificationService: NotificationService) { }
 
   ngOnInit() {
     this.load();
   }
 
   load() {
-    this.loading = true;
-    this.errorMessage = '';
+    this.loading.set(true);
+    this.errorMessage.set('');
     this.notificationService.list().subscribe({
       next: (res) => {
-        this.items = res ?? [];
+        this.items.set(res ?? []);
         this.notificationService.refreshUnreadCount().subscribe();
-        this.loading = false;
-        this.change.markForCheck();
+        this.loading.set(false);
       },
       error: (err) => {
-        this.errorMessage = 'Failed to load notifications.';
-        this.loading = false;
+        this.errorMessage.set('Failed to load notifications.');
+        this.loading.set(false);
         console.error(err);
-        this.change.markForCheck();
       }
     });
   }
@@ -43,16 +41,15 @@ export class NotificationsComponent implements OnInit {
   markRead(id: number) {
     this.notificationService.markRead(id).subscribe({
       next: () => {
-        this.items = this.items.map((n) =>
+        this.items.update(items => items.map((n) =>
           n.id === id ? { ...n, read: true } : n
-        );
+        ));
         this.notificationService.refreshUnreadCount().subscribe();
-        setTimeout(() => this.change.markForCheck(), 0)
       },
       error: (err) =>  {
-        console.error(err),
-        this.change.markForCheck()
+        console.error(err);
       },
     });
   }
 }
+

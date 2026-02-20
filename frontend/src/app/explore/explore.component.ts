@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PostService } from '../posts/post.service';
@@ -13,18 +13,33 @@ import { UserProfile, UserService } from '../core/services/user.service';
   styleUrl: './explore.component.scss'
 })
 export class ExploreComponent implements OnInit {
-  posts: any[] = [];
-  authors: { id: number; username: string }[] = [];
-  followingIds = new Set<number>();
-  currentUser?: UserProfile;
-  loading = false;
-  errorMessage = '';
+  posts = signal<any[]>([]);
+  followingIds = signal<Set<number>>(new Set());
+  currentUser = signal<UserProfile | undefined>(undefined);
+  loading = signal(false);
+  errorMessage = signal('');
+
+  authors = computed(() => {
+    const map = new Map<number, string>();
+    const postsList = this.posts();
+    const user = this.currentUser();
+    
+    postsList.forEach((post) => {
+      if (post?.authorId && post?.authorUsername) {
+        // Filter out current user from authors list
+        if (user && post.authorId === user.id) {
+          return;
+        }
+        map.set(post.authorId, post.authorUsername);
+      }
+    });
+    return Array.from(map.entries()).map(([id, username]) => ({ id, username }));
+  });
 
   constructor(
     private postService: PostService,
     private followService: FollowService,
-    private userService: UserService,
-    private change: ChangeDetectorRef
+    private userService: UserService
   ) { }
 
   ngOnInit() {
@@ -36,12 +51,10 @@ export class ExploreComponent implements OnInit {
   loadCurrentUser() {
     this.userService.me().subscribe({
       next: (user) => {
-        this.currentUser = user;
-        this.change.markForCheck();
+        this.currentUser.set(user);
       },
       error: (err) => {
         console.error(err);
-        this.change.markForCheck();
       }
     });
   }
@@ -49,72 +62,63 @@ export class ExploreComponent implements OnInit {
   loadFollowing() {
     this.followService.getFollowing().subscribe({
       next: (res) => {
-        this.followingIds = new Set((res ?? []).map((user) => user.id));
-        this.change.markForCheck();
+        this.followingIds.set(new Set((res ?? []).map((user) => user.id)));
       },
       error: (err) => {
         console.error(err);
-        this.change.markForCheck();
       }
     });
   }
 
   loadPosts(page = 0) {
-    this.loading = true;
-    this.errorMessage = '';
-    this.change.markForCheck();
+    this.loading.set(true);
+    this.errorMessage.set('');
     this.postService.getFeed(page).subscribe({
       next: (res) => {
-        this.posts = Array.isArray(res?.content) ? res.content : (res ?? []);
-        this.authors = this.buildAuthors(this.posts);
-        this.loading = false;
-        this.change.markForCheck();
+        this.posts.set(Array.isArray(res?.content) ? res.content : (res ?? []));
+        this.loading.set(false);
       },
       error: (err) => {
         console.error(err);
-        this.loading = false;
-        this.errorMessage = 'Failed to load explore feed.';
-        this.change.markForCheck();
+        this.loading.set(false);
+        this.errorMessage.set('Failed to load explore feed.');
       }
     });
-  }
-
-  buildAuthors(posts: any[]) {
-    const map = new Map<number, string>();
-    posts.forEach((post) => {
-      if (post?.authorId && post?.authorUsername) {
-        // Filter out current user from authors list
-        if (this.currentUser && post.authorId === this.currentUser.id) {
-          return;
-        }
-        map.set(post.authorId, post.authorUsername);
-      }
-    });
-    return Array.from(map.entries()).map(([id, username]) => ({ id, username }));
   }
 
   toggleFollow(userId: number) {
-    const isFollowing = this.followingIds.has(userId);
-    if (isFollowing) {
-      this.followingIds.delete(userId);
-    } else {
-      this.followingIds.add(userId);
-    }
+    const isFollowing = this.followingIds().has(userId);
+    
+    this.followingIds.update(ids => {
+      const next = new Set(ids);
+      if (isFollowing) {
+        next.delete(userId);
+      } else {
+        next.add(userId);
+      }
+      return next;
+    });
+
     this.followService.toggleFollow(userId).subscribe({
       next: () => { },
       error: (err) => {
         console.error(err);
-        if (isFollowing) {
-          this.followingIds.add(userId);
-        } else {
-          this.followingIds.delete(userId);
-        }
+        // Rollback
+        this.followingIds.update(ids => {
+          const next = new Set(ids);
+          if (isFollowing) {
+            next.add(userId);
+          } else {
+            next.delete(userId);
+          }
+          return next;
+        });
       }
     });
   }
 
   isFollowing(userId: number) {
-    return this.followingIds.has(userId);
+    return this.followingIds().has(userId);
   }
 
   formatDate(value: string) {
@@ -125,3 +129,4 @@ export class ExploreComponent implements OnInit {
     return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
   }
 }
+

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef , Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -13,9 +13,9 @@ import { AuthService } from '../auth/auth.service';
   styleUrl: './settings.component.scss'
 })
 export class SettingsComponent implements OnInit {
-  user?: UserProfile;
-  loading = false;
-  errorMessage = '';
+  user = signal<UserProfile | undefined>(undefined);
+  loading = signal(false);
+  errorMessage = signal('');
   form: FormGroup;
   
 
@@ -23,8 +23,7 @@ export class SettingsComponent implements OnInit {
     private userService: UserService,
     private router: Router,
     private fb: FormBuilder,
-    private authService: AuthService,
-    private change: ChangeDetectorRef,
+    private authService: AuthService
   ) {
     this.form = this.fb.group({
       username: ['', Validators.required],
@@ -37,24 +36,21 @@ export class SettingsComponent implements OnInit {
   }
 
   loadProfile() {
-    this.loading = true;
-    this.errorMessage = '';
+    this.loading.set(true);
+    this.errorMessage.set('');
     this.userService.me().subscribe({
       next: (res) => {
-        this.user = res;
+        this.user.set(res);
         this.form.patchValue({
           username: res.username,
           email: res.email
-          
         });
-        this.loading = false;
-        this.change.markForCheck();
+        this.loading.set(false);
       },
       error: (err) => {
         console.error(err);
-        this.loading = false;
-        this.errorMessage = 'Failed to load settings.';
-         this.change.markForCheck();
+        this.loading.set(false);
+        this.errorMessage.set('Failed to load settings.');
       }
     });
   }
@@ -66,13 +62,11 @@ export class SettingsComponent implements OnInit {
     }
     this.userService.updateMe(this.form.value).subscribe({
       next: (res) => {
-        this.user = res;
-         this.change.markForCheck();
+        this.user.set(res);
       },
       error: (err) => {
         console.error(err);
-        this.errorMessage = 'Failed to update profile.';
-         this.change.markForCheck();
+        this.errorMessage.set('Failed to update profile.');
       }
     });
   }
@@ -82,3 +76,4 @@ export class SettingsComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 }
+

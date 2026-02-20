@@ -6,17 +6,17 @@
           <p class="text-primary fw-bold text-uppercase tracking-wider small mb-2">Activities</p>
           <h1 class="fw-bold mb-0">Notifications</h1>
         </div>
-        <div class="small text-muted" *ngIf="items.length">
-          {{ items.length }} total updates
+        <div class="small text-muted" *ngIf="items().length">
+          {{ items().length }} total updates
         </div>
       </header>
 
-      <div *ngIf="loading" class="text-center py-5"><span class="spinner-border text-primary"></span></div>
+      <div *ngIf="loading()" class="text-center py-5"><span class="spinner-border text-primary"></span></div>
       
-      <div class="alert alert-danger" *ngIf="errorMessage">{{ errorMessage }}</div>
+      <div class="alert alert-danger" *ngIf="errorMessage()">{{ errorMessage() }}</div>
 
-      <div class="notifications-list d-grid gap-3" *ngIf="items.length">
-        <article class="card p-4 border-0 shadow-sm" *ngFor="let item of items" [class.opacity-75]="item.read" [style.border-left]="item.read ? 'none' : '4px solid var(--primary)'">
+      <div class="notifications-list d-grid gap-3" *ngIf="items().length">
+        <article class="card p-4 border-0 shadow-sm" *ngFor="let item of items()" [class.opacity-75]="item.read" [style.border-left]="item.read ? 'none' : '4px solid var(--primary)'">
           <div class="d-flex justify-content-between align-items-center gap-4">
             <div class="d-flex align-items-start gap-3">
               <div class="icon-wrap bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-grid place-items-center" style="width: 40px; height: 40px;">
@@ -36,7 +36,7 @@
         </article>
       </div>
 
-      <div *ngIf="!loading && !items.length" class="text-center py-5 bg-white rounded-4 border">
+      <div *ngIf="!loading() && !items().length" class="text-center py-5 bg-white rounded-4 border">
         <div class="display-1 text-muted opacity-10 mb-3"><i class="bi bi-bell-slash"></i></div>
         <p class="text-muted">No new notifications.</p>
       </div>

@@ -7,42 +7,42 @@
         </a>
       </nav>
 
-      <p *ngIf="loading" class="text-center py-5"><span class="spinner-border text-primary"></span></p>
-      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+      <p *ngIf="loading()" class="text-center py-5"><span class="spinner-border text-primary"></span></p>
+      <div *ngIf="errorMessage()" class="alert alert-danger">{{ errorMessage() }}</div>
 
       <!-- Main Post Card -->
-      <article *ngIf="post" class="card p-4 p-lg-5 border-0 shadow-lg mb-5">
+      <article *ngIf="post()" class="card p-4 p-lg-5 border-0 shadow-lg mb-5">
         <header class="d-flex justify-content-between align-items-center mb-4">
           <div class="d-flex gap-3 align-items-center">
             <div class="avatar-sm bg-primary bg-opacity-10 text-primary d-grid place-items-center fw-bold h5 mb-0">
-              {{ post.authorUsername?.charAt(0).toUpperCase() }}
+              {{ post().authorUsername?.charAt(0).toUpperCase() }}
             </div>
             <div>
-              <h5 class="fw-bold mb-0">{{ post.authorUsername }}</h5>
-              <p class="text-muted small mb-0">{{ formatDate(post.createdAt) }}</p>
+              <h5 class="fw-bold mb-0">{{ post().authorUsername }}</h5>
+              <p class="text-muted small mb-0">{{ formatDate(post().createdAt) }}</p>
             </div>
           </div>
           
-          <button class="btn btn-sm" [class.btn-primary]="!isFollowingAuthor()" [class.btn-outline-primary]="isFollowingAuthor()" *ngIf="!post.mine" (click)="toggleFollow()">
+          <button class="btn btn-sm" [class.btn-primary]="!isFollowingAuthor()" [class.btn-outline-primary]="isFollowingAuthor()" *ngIf="!post().mine" (click)="toggleFollow()">
             {{ isFollowingAuthor() ? 'Unfollow' : 'Follow' }}
           </button>
         </header>
 
         <div class="post-body h4 fw-normal text-ink mb-4" style="white-space: pre-wrap; line-height: 1.6;">
-          {{ post.content }}
+          {{ post().content }}
         </div>
 
-        <div class="media-grid mb-4" *ngIf="post.mediaUrls?.length">
-          <ng-container *ngFor="let url of post.mediaUrls">
+        <div class="media-grid mb-4" *ngIf="post().mediaUrls?.length">
+          <ng-container *ngFor="let url of post().mediaUrls">
             <img *ngIf="!isVideo(url)" [src]="url" class="img-fluid" alt="Journal media" />
             <video *ngIf="isVideo(url)" [src]="url" controls class="w-100 rounded-4"></video>
           </ng-container>
         </div>
 
         <div class="d-flex align-items-center gap-4 border-top pt-4">
-          <button class="btn btn-lg" [class.text-primary]="post.likedByMe" [class.btn--ghost]="!post.likedByMe" (click)="toggleLike()">
-            <i class="bi" [class.bi-heart-fill]="post.likedByMe" [class.bi-heart]="!post.likedByMe"></i>
-            <span class="ms-2">{{ post.likes || 0 }}</span>
+          <button class="btn btn-lg" [class.text-primary]="post().likedByMe" [class.btn--ghost]="!post().likedByMe" (click)="toggleLike()">
+            <i class="bi" [class.bi-heart-fill]="post().likedByMe" [class.bi-heart]="!post().likedByMe"></i>
+            <span class="ms-2">{{ post().likes || 0 }}</span>
           </button>
           
           <button class="btn btn-lg btn--ghost" (click)="toggleReport()">
@@ -51,22 +51,22 @@
         </div>
 
         <!-- Inline Report -->
-        <div *ngIf="reporting" class="mt-4 p-4 bg-light rounded-4 border border-danger border-opacity-10">
+        <div *ngIf="reporting()" class="mt-4 p-4 bg-light rounded-4 border border-danger border-opacity-10">
           <h6 class="fw-bold mb-3 text-danger">Flag Inappropriate Content</h6>
           <form [formGroup]="reportForm" (ngSubmit)="submitReport()">
             <textarea rows="3" class="form-control mb-3" placeholder="Describe the issue..." formControlName="reason"></textarea>
             <div class="d-flex gap-2">
               <button type="submit" class="btn btn-danger px-4">Submit</button>
-              <button type="button" class="btn btn-light" (click)="reporting = false">Cancel</button>
+              <button type="button" class="btn btn-light" (click)="reporting.set(false)">Cancel</button>
             </div>
-            <p *ngIf="reportMessage" class="small text-success mt-3 mb-0">{{ reportMessage }}</p>
+            <p *ngIf="reportMessage()" class="small text-success mt-3 mb-0">{{ reportMessage() }}</p>
           </form>
         </div>
       </article>
 
       <!-- Comments Section -->
-      <section class="comments-section" *ngIf="post">
-        <h4 class="fw-bold mb-4">Discussions ({{ comments.length }})</h4>
+      <section class="comments-section" *ngIf="post()">
+        <h4 class="fw-bold mb-4">Discussions ({{ comments().length }})</h4>
 
         <!-- Comment Input -->
         <div class="card p-4 mb-5 shadow-sm border-primary border-opacity-10">
@@ -74,12 +74,12 @@
             <div class="avatar-sm bg-light flex-shrink-0"></div>
             <form [formGroup]="form" (ngSubmit)="addComment()" class="flex-grow-1">
               <textarea rows="2" class="form-control border-0 bg-transparent ps-0" 
-                        [placeholder]="replyingToId ? 'Replying to comment...' : 'Add to the discussion...'" 
+                        [placeholder]="replyingToId() ? 'Replying to comment...' : 'Add to the discussion...'" 
                         formControlName="content" style="resize: none;"></textarea>
               <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                <span class="small text-muted" *ngIf="replyingToId">Replying to #{{ replyingToId }}</span>
+                <span class="small text-muted" *ngIf="replyingToId()">Replying to #{{ replyingToId() }}</span>
                 <div class="d-flex gap-2 ms-auto">
-                  <button *ngIf="replyingToId" type="button" class="btn btn-sm btn--ghost" (click)="setReply(null)">Cancel</button>
+                  <button *ngIf="replyingToId()" type="button" class="btn btn-sm btn--ghost" (click)="setReply(null)">Cancel</button>
                   <button type="submit" class="btn btn-primary px-4 shadow-sm" [disabled]="form.invalid">Post Comment</button>
                 </div>
               </div>
@@ -89,9 +89,9 @@
 
         <!-- Comments List -->
         <div class="comments-list d-grid gap-4">
-          <p *ngIf="commentsLoading" class="text-center py-3"><span class="spinner-border spinner-border-sm text-primary"></span></p>
+          <p *ngIf="commentsLoading()" class="text-center py-3"><span class="spinner-border spinner-border-sm text-primary"></span></p>
           
-          <div *ngFor="let comment of comments">
+          <div *ngFor="let comment of comments()">
             <!-- Root Comment -->
             <article class="d-flex gap-3" *ngIf="!comment.parentId">
               <div class="avatar-sm bg-light flex-shrink-0 d-grid place-items-center fw-bold">
@@ -113,7 +113,7 @@
 
                 <!-- Nested Replies -->
                 <div class="replies-list mt-3 d-grid gap-3 ps-lg-4">
-                  <ng-container *ngFor="let reply of comments">
+                  <ng-container *ngFor="let reply of comments()">
                     <article class="d-flex gap-2" *ngIf="reply.parentId === comment.id">
                       <div class="avatar-sm bg-light flex-shrink-0" style="width: 32px; height: 32px;"></div>
                       <div class="flex-grow-1">
@@ -136,11 +136,12 @@
             </article>
           </div>
           
-          <div *ngIf="!commentsLoading && !comments.length" class="text-center py-5 opacity-50">
+          <div *ngIf="!commentsLoading() && !comments().length" class="text-center py-5 opacity-50">
             <i class="bi bi-chat-square-text h1 d-block mb-3"></i>
             <p>No comments yet. Start the conversation!</p>
           </div>
         </div>
+
       </section>
     </div>
   </div>

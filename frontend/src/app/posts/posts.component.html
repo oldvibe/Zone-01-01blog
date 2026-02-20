@@ -28,10 +28,10 @@
     <main class="col-lg-6">
       <!-- Feed Switch -->
       <div class="d-flex gap-2 mb-4">
-        <button type="button" class="btn flex-grow-1" [class.btn-primary]="feedMode === 'public'" [class.btn--ghost]="feedMode !== 'public'" (click)="setMode('public')">
+        <button type="button" class="btn flex-grow-1" [class.btn-primary]="feedMode() === 'public'" [class.btn--ghost]="feedMode() !== 'public'" (click)="setMode('public')">
           Public Feed
         </button>
-        <button type="button" class="btn flex-grow-1" [class.btn-primary]="feedMode === 'subscriptions'" [class.btn--ghost]="feedMode !== 'subscriptions'" (click)="setMode('subscriptions')">
+        <button type="button" class="btn flex-grow-1" [class.btn-primary]="feedMode() === 'subscriptions'" [class.btn--ghost]="feedMode() !== 'subscriptions'" (click)="setMode('subscriptions')">
           Following
         </button>
       </div>
@@ -45,8 +45,8 @@
           </div>
         </div>
         
-        <div class="media-preview-grid mb-3" *ngIf="mediaPreviews.length">
-          <div *ngFor="let media of mediaPreviews; let i = index" class="media-item position-relative">
+        <div class="media-preview-grid mb-3" *ngIf="mediaPreviews().length">
+          <div *ngFor="let media of mediaPreviews(); let i = index" class="media-item position-relative">
             <button type="button" class="btn-remove-media" (click)="removeMedia(i)" title="Remove media">
               <i class="bi bi-x"></i>
             </button>
@@ -64,23 +64,23 @@
               <input id="mediaFile" type="file" multiple (change)="onFileSelected($event)" class="d-none" />
             </label>
           </div>
-          <button class="btn btn-primary px-4" type="submit" [disabled]="form.invalid || loading">
+          <button class="btn btn-primary px-4" type="submit" [disabled]="form.invalid || loading()">
             Post
           </button>
         </div>
       </form>
 
-      <p *ngIf="loading" class="text-center py-5 text-muted">
+      <p *ngIf="loading()" class="text-center py-5 text-muted">
         <span class="spinner-border spinner-border-sm me-2"></span>Loading your feed...
       </p>
       
-      <div *ngIf="errorMessage" class="alert alert-danger rounded-4 shadow-sm mb-4">
-        <i class="bi bi-exclamation-triangle me-2"></i>{{ errorMessage }}
+      <div *ngIf="errorMessage()" class="alert alert-danger rounded-4 shadow-sm mb-4">
+        <i class="bi bi-exclamation-triangle me-2"></i>{{ errorMessage() }}
       </div>
 
       <!-- Posts List -->
-      <div class="posts-list d-grid gap-4" *ngIf="posts.length">
-        <article class="card p-4 overflow-hidden" *ngFor="let post of posts">
+      <div class="posts-list d-grid gap-4" *ngIf="posts().length">
+        <article class="card p-4 overflow-hidden" *ngFor="let post of posts()">
           <header class="d-flex justify-content-between align-items-start mb-3">
             <div class="d-flex gap-3">
               <div class="avatar-sm bg-primary bg-opacity-10 text-primary d-grid place-items-center fw-bold">
@@ -124,19 +124,19 @@
           </div>
 
           <!-- Quick Report Form -->
-          <form *ngIf="reportingPostId === post.id" class="mt-4 p-3 bg-light rounded-4 border" [formGroup]="reportForm" (ngSubmit)="submitReport(post)">
+          <form *ngIf="reportingPostId() === post.id" class="mt-4 p-3 bg-light rounded-4 border" [formGroup]="reportForm" (ngSubmit)="submitReport(post)">
             <label class="small fw-bold mb-2">Report Post</label>
             <textarea rows="2" class="form-control mb-2" placeholder="Tell us why this post is inappropriate..." formControlName="reason"></textarea>
             <div class="d-flex gap-2">
               <button class="btn btn-sm btn-danger px-3" type="submit">Submit</button>
-              <button class="btn btn-sm btn-light" type="button" (click)="reportingPostId = null">Cancel</button>
+              <button class="btn btn-sm btn-light" type="button" (click)="reportingPostId.set(null)">Cancel</button>
             </div>
-            <p *ngIf="reportMessage" class="small text-success mt-2 mb-0">{{ reportMessage }}</p>
+            <p *ngIf="reportMessage()" class="small text-success mt-2 mb-0">{{ reportMessage() }}</p>
           </form>
         </article>
       </div>
 
-      <div *ngIf="!loading && !posts.length" class="text-center py-5">
+      <div *ngIf="!loading() && !posts().length" class="text-center py-5">
         <div class="display-1 text-muted opacity-10 mb-4"><i class="bi bi-journal-text"></i></div>
         <h4 class="text-muted">No posts found</h4>
         <p class="text-muted small">Be the first one to share an update!</p>

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -15,18 +15,18 @@ import { ReportService } from '../core/services/report.service';
   styleUrl: './post-detail.component.scss'
 })
 export class PostDetailComponent implements OnInit {
-  post: any | null = null;
-  comments: CommentItem[] = [];
-  loading = false;
-  commentsLoading = false;
-  errorMessage = '';
+  post = signal<any | null>(null);
+  comments = signal<CommentItem[]>([]);
+  loading = signal(false);
+  commentsLoading = signal(false);
+  errorMessage = signal('');
   form: FormGroup;
   reportForm: FormGroup;
-  reporting = false;
-  reportMessage = '';
-  commentReportMessage = '';
-  followingIds = new Set<number>();
-  replyingToId: number | null = null;
+  reporting = signal(false);
+  reportMessage = signal('');
+  commentReportMessage = signal('');
+  followingIds = signal<Set<number>>(new Set());
+  replyingToId = signal<number | null>(null);
 
   constructor(
     private route: ActivatedRoute,
@@ -34,8 +34,7 @@ export class PostDetailComponent implements OnInit {
     private commentService: CommentService,
     private followService: FollowService,
     private reportService: ReportService,
-    private fb: FormBuilder,
-    private change : ChangeDetectorRef
+    private fb: FormBuilder
   ) {
     this.form = this.fb.group({
       content: ['', Validators.required]
@@ -53,7 +52,7 @@ export class PostDetailComponent implements OnInit {
   loadFollowing() {
     this.followService.getFollowing().subscribe({
       next: (res) => {
-        this.followingIds = new Set((res ?? []).map((u) => u.id));
+        this.followingIds.set(new Set((res ?? []).map((u) => u.id)));
       },
       error: (err) => console.error(err)
     });
@@ -62,29 +61,25 @@ export class PostDetailComponent implements OnInit {
   loadPost() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!id) {
-      this.errorMessage = 'Post not found.';
+      this.errorMessage.set('Post not found.');
       return;
     }
-    this.loading = true;
-    this.errorMessage = '';
+    this.loading.set(true);
+    this.errorMessage.set('');
     this.loadComments(id);
 
     this.postService.getById(id).subscribe({
       next: (res) => {
-        this.post = res ?? null;
-        this.loading = false;
-        if (this.post) {
-        } else {
-          this.errorMessage = 'Post not found.';
-          this.change.markForCheck();
+        this.post.set(res ?? null);
+        this.loading.set(false);
+        if (!this.post()) {
+          this.errorMessage.set('Post not found.');
         }
       },
       error: (err) => {
         console.error(err);
-        this.loading = false;
-        this.errorMessage = 'Failed to load post.';
-        this.change.markForCheck();
-
+        this.loading.set(false);
+        this.errorMessage.set('Failed to load post.');
       }
     });
   }
@@ -93,19 +88,18 @@ export class PostDetailComponent implements OnInit {
     if (!postId) {
       return;
     }
-    this.commentsLoading = true;
+    this.commentsLoading.set(true);
     this.commentService.list(postId).subscribe({
-      next: (res) => (this.comments = res ?? []),
+      next: (res) => this.comments.set(res ?? []),
       error: (err) => console.error(err),
       complete: () => {
-        this.commentsLoading = false;
-        this.change.markForCheck();
+        this.commentsLoading.set(false);
       }
     });
   }
 
   setReply(commentId: number | null) {
-    this.replyingToId = commentId;
+    this.replyingToId.set(commentId);
     if (commentId) {
       this.form.patchValue({ content: `@Reply to #${commentId}: ` });
     } else {
@@ -114,11 +108,11 @@ export class PostDetailComponent implements OnInit {
   }
 
   addComment() {
-    if (this.form.invalid || !this.post?.id) {
+    if (this.form.invalid || !this.post()?.id) {
       return;
     }
     const content = this.form.value.content;
-    const parentId = this.replyingToId || undefined;
+    const parentId = this.replyingToId() || undefined;
 
     const optimistic = {
       id: Date.now(),
@@ -128,50 +122,47 @@ export class PostDetailComponent implements OnInit {
       createdAt: new Date().toISOString(),
       parentId: parentId
     } as CommentItem;
-    this.comments = [optimistic, ...this.comments];
+    
+    this.comments.update(comments => [optimistic, ...comments]);
     this.form.reset();
-    this.replyingToId = null;
+    this.replyingToId.set(null);
 
-    this.commentService.add(this.post.id, content, parentId).subscribe({
+    this.commentService.add(this.post()!.id, content, parentId).subscribe({
       next: (comment) => {
-        this.comments = [
+        this.comments.update(comments => [
           comment,
-          ...this.comments.filter((item) => item.id !== optimistic.id)
-        ];
-        this.change.markForCheck();
+          ...comments.filter((item) => item.id !== optimistic.id)
+        ]);
       },
       error: (err) => {
         console.error(err);
-        this.comments = this.comments.filter((item) => item.id !== optimistic.id);
-        this.change.markForCheck();
+        this.comments.update(comments => comments.filter((item) => item.id !== optimistic.id));
       }
     });
   }
 
   toggleReport() {
-    this.reporting = !this.reporting;
-    this.reportMessage = '';
+    this.reporting.update(r => !r);
+    this.reportMessage.set('');
   }
 
   submitReport() {
-    if (!this.post?.id || this.reportForm.invalid) {
+    if (!this.post()?.id || this.reportForm.invalid) {
       this.reportForm.markAllAsTouched();
       return;
     }
     const reason = this.reportForm.value.reason;
     this.reportService
-      .create({ reason, targetType: 'POST', targetId: this.post.id })
+      .create({ reason, targetType: 'POST', targetId: this.post()!.id })
       .subscribe({
         next: () => {
-          this.reportMessage = 'Report submitted. Thank you.';
+          this.reportMessage.set('Report submitted. Thank you.');
           this.reportForm.reset();
-          this.reporting = false;
-          this.change.markForCheck();
+          this.reporting.set(false);
         },
         error: (err) => {
           console.error(err);
-          this.reportMessage = 'Failed to submit report.';
-          this.change.markForCheck();
+          this.reportMessage.set('Failed to submit report.');
         }
       });
   }
@@ -184,78 +175,91 @@ export class PostDetailComponent implements OnInit {
       .create({ reason: 'Inappropriate comment', targetType: 'COMMENT', targetId: comment.id })
       .subscribe({
         next: () => {
-          this.commentReportMessage = 'Comment reported. Thank you.';
-          this.change.markForCheck();
+          this.commentReportMessage.set('Comment reported. Thank you.');
         },
         error: (err) => {
           console.error(err);
-          this.commentReportMessage = 'Failed to report comment.';
-          this.change.markForCheck();
+          this.commentReportMessage.set('Failed to report comment.');
         }
       });
   }
 
   deleteComment(id: number) {
-    const prev = this.comments;
-    this.comments = this.comments.filter((item) => item.id !== id);
+    const prev = this.comments();
+    this.comments.update(comments => comments.filter((item) => item.id !== id));
     this.commentService.remove(id).subscribe({
       next: () => {},
       error: (err) => {
         console.error(err);
-        this.comments = prev;
+        this.comments.set(prev);
       }
     });
   }
 
   toggleLike() {
-    if (!this.post?.id) {
+    if (!this.post()?.id) {
       return;
     }
-    const liked = !!this.post.likedByMe;
-    this.post = {
-      ...this.post,
+    const liked = !!this.post()!.likedByMe;
+    
+    // Optimistic update
+    this.post.update(p => ({
+      ...p,
       likedByMe: !liked,
-      likes: Math.max(0, (this.post.likes ?? 0) + (liked ? -1 : 1))
-    };
-    this.postService.like(this.post.id).subscribe({
+      likes: Math.max(0, (p.likes ?? 0) + (liked ? -1 : 1))
+    }));
+
+    this.postService.like(this.post()!.id).subscribe({
       next: () => {},
       error: (err) => {
         console.error(err);
-        this.post = {
-          ...this.post,
+        // Rollback
+        this.post.update(p => ({
+          ...p,
           likedByMe: liked,
-          likes: Math.max(0, (this.post.likes ?? 0) + (liked ? 1 : -1))
-        };
+          likes: Math.max(0, (p.likes ?? 0) + (liked ? 1 : -1))
+        }));
       }
     });
   }
 
   toggleFollow() {
-    if (!this.post?.authorId || this.post?.mine) {
+    if (!this.post()?.authorId || this.post()?.mine) {
       return;
     }
-    const isFollowing = this.followingIds.has(this.post.authorId);
-    if (isFollowing) {
-      this.followingIds.delete(this.post.authorId);
-    } else {
-      this.followingIds.add(this.post.authorId);
-    }
-    this.followService.toggleFollow(this.post.authorId).subscribe({
+    const isFollowing = this.followingIds().has(this.post()!.authorId);
+    
+    this.followingIds.update(ids => {
+      const next = new Set(ids);
+      if (isFollowing) {
+        next.delete(this.post()!.authorId);
+      } else {
+        next.add(this.post()!.authorId);
+      }
+      return next;
+    });
+
+    this.followService.toggleFollow(this.post()!.authorId).subscribe({
       next: () => {
       },
       error: (err) => {
         console.error(err);
-        if (isFollowing) {
-          this.followingIds.add(this.post.authorId);
-        } else {
-          this.followingIds.delete(this.post.authorId);
-        }
+        // Rollback
+        this.followingIds.update(ids => {
+          const next = new Set(ids);
+          if (isFollowing) {
+            next.add(this.post()!.authorId);
+          } else {
+            next.delete(this.post()!.authorId);
+          }
+          return next;
+        });
       },
     });
   }
 
   isFollowingAuthor() {
-    return this.post?.authorId ? this.followingIds.has(this.post.authorId) : false;
+    return this.post()?.authorId ? this.followingIds().has(this.post()!.authorId) : false;
   }
 
   formatDate(value: string) {
@@ -271,5 +275,6 @@ export class PostDetailComponent implements OnInit {
     return extensions.some(ext => url.toLowerCase().endsWith(ext));
   }
 }
+
 
 
