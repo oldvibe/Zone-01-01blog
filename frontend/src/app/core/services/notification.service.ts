@@ -30,4 +30,12 @@ export class NotificationService {
   markRead(id: number) {
     return this.http.post(`${this.api}/${id}/read`, {});
   }
+
+  markUnread(id: number) {
+    return this.http.post(`${this.api}/${id}/unread`, {});
+  }
+
+  markAllRead() {
+    return this.http.post(`${this.api}/read-all`, {});
+  }
 }

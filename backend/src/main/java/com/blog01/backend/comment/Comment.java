@@ -29,6 +29,9 @@ public class Comment {
     @JoinColumn(name = "parent_id")
     private Comment parent;
 
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<Comment> replies;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 }

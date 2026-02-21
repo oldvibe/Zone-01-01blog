@@ -6,6 +6,9 @@ export interface AdminReport {
   reason: string;
   targetType: string;
   targetId: number;
+  targetOwnerId?: number;
+  targetContent?: string;
+  targetOwnerUsername?: string;
   reporterUsername: string;
   resolved: boolean;
   createdAt: string;

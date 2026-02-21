@@ -71,4 +71,35 @@ public class NotificationService {
                 notification.setRead(true);
                 notificationRepository.save(notification);
         }
+
+        /**
+         * 🔹 Mark notification as unread
+         */
+        public void markAsUnread(Long notificationId, String username) {
+
+                User user = userRepository.findByUsername(username)
+                                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+
+                Notification notification = notificationRepository.findById(notificationId)
+                                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Notification not found"));
+
+                if (!notification.getUser().getId().equals(user.getId())) {
+                        throw new ApiException(HttpStatus.FORBIDDEN, "Not allowed");
+                }
+
+                notification.setRead(false);
+                notificationRepository.save(notification);
+        }
+
+        /**
+         * 🔹 Mark all notifications as read
+         */
+        public void markAllAsRead(String username) {
+                User user = userRepository.findByUsername(username)
+                                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+
+                List<Notification> notifications = notificationRepository.findByUserAndReadFalse(user);
+                notifications.forEach(n -> n.setRead(true));
+                notificationRepository.saveAll(notifications);
+        }
 }

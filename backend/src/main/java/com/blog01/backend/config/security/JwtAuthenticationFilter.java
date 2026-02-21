@@ -38,26 +38,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String jwt = authHeader.substring(7);
-        String username;
+        String userId;
         try {
-            username = jwtService.extractUsername(jwt);
+            userId = jwtService.extractUserId(jwt);
         } catch (Exception ex) {
             // Invalid token; continue without authentication
             filterChain.doFilter(request, response);
             return;
         }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails;
             try {
-                userDetails = userDetailsService.loadUserByUsername(username);
+                userDetails = userDetailsService.loadUserByUsername(userId);
             } catch (org.springframework.security.core.userdetails.UsernameNotFoundException ex) {
                 // Stale/invalid token; continue unauthenticated
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            if (jwtService.isTokenValid(jwt, userDetails.getUsername()) && userDetails.isEnabled()) {
+            if (jwtService.isTokenValid(jwt, userDetails instanceof com.blog01.backend.security.UserPrincipal ? ((com.blog01.backend.security.UserPrincipal)userDetails).getId().toString() : userDetails.getUsername()) && userDetails.isEnabled()) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,

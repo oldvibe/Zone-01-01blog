@@ -3,6 +3,8 @@ package com.blog01.backend.report;
 import com.blog01.backend.common.ApiException;
 import com.blog01.backend.user.User;
 import com.blog01.backend.user.UserRepository;
+import com.blog01.backend.post.PostRepository;
+import com.blog01.backend.comment.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ public class ReportService {
 
     private final ReportRepository reportRepository;
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
 
     public List<ReportResponse> pendingReports() {
         return reportRepository.findByResolvedFalse()
@@ -64,11 +68,50 @@ public class ReportService {
     }
 
     private ReportResponse toResponse(Report report) {
+        String targetContent = null;
+        String targetOwnerUsername = null;
+        Long targetOwnerId = null;
+
+        try {
+            String type = report.getTargetType().toUpperCase();
+            switch (type) {
+                case "POST" -> {
+                    var post = postRepository.findById(report.getTargetId()).orElse(null);
+                    if (post != null) {
+                        targetContent = post.getContent();
+                        targetOwnerUsername = post.getAuthor().getUsername();
+                        targetOwnerId = post.getAuthor().getId();
+                    }
+                }
+                case "COMMENT" -> {
+                    var comment = commentRepository.findById(report.getTargetId()).orElse(null);
+                    if (comment != null) {
+                        targetContent = comment.getContent();
+                        targetOwnerUsername = comment.getAuthor().getUsername();
+                        targetOwnerId = comment.getAuthor().getId();
+                    }
+                }
+                case "USER" -> {
+                    var user = userRepository.findById(report.getTargetId()).orElse(null);
+                    if (user != null) {
+                        targetOwnerUsername = user.getUsername();
+                        targetOwnerId = user.getId();
+                        targetContent = "User Profile: " + user.getUsername();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Silently fail if target not found
+        }
+
         return ReportResponse.builder()
                 .id(report.getId())
                 .reason(report.getReason())
                 .targetType(report.getTargetType())
                 .targetId(report.getTargetId())
+                .targetOwnerId(targetOwnerId)
+                .targetContent(targetContent)
+                .targetOwnerUsername(targetOwnerUsername)
                 .reporterUsername(report.getReporter().getUsername())
                 .resolved(report.isResolved())
                 .createdAt(report.getCreatedAt())

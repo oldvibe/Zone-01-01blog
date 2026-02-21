@@ -16,6 +16,7 @@ export class SettingsComponent implements OnInit {
   user = signal<UserProfile | undefined>(undefined);
   loading = signal(false);
   errorMessage = signal('');
+  successMessage = signal('');
   form: FormGroup;
   
 
@@ -27,7 +28,8 @@ export class SettingsComponent implements OnInit {
   ) {
     this.form = this.fb.group({
       username: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]]
+      email: ['', [Validators.required, Validators.email]],
+      password: ['']
     });
   }
 
@@ -60,13 +62,19 @@ export class SettingsComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
+    this.errorMessage.set('');
+    this.successMessage.set('');
+    
     this.userService.updateMe(this.form.value).subscribe({
       next: (res) => {
         this.user.set(res);
+        this.successMessage.set('Profile updated successfully.');
+        this.form.patchValue({ password: '' });
+        setTimeout(() => this.successMessage.set(''), 3000);
       },
       error: (err) => {
         console.error(err);
-        this.errorMessage.set('Failed to update profile.');
+        this.errorMessage.set(err?.error?.message || 'Failed to update profile.');
       }
     });
   }

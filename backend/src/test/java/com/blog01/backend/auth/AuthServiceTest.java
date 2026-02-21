@@ -63,7 +63,7 @@ class AuthServiceTest {
         when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(false);
         when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(user);
-        when(jwtService.generateToken("testuser")).thenReturn("mock-jwt-token");
+        when(jwtService.generateToken(Long.valueOf(1))).thenReturn("mock-jwt-token");
 
         AuthResponse response = authService.register(registerRequest);
 
@@ -86,7 +86,7 @@ class AuthServiceTest {
     void login_ShouldReturnToken_WhenCredentialsAreValid() {
         when(userRepository.findByEmail(loginRequest.email())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(loginRequest.password(), user.getPassword())).thenReturn(true);
-        when(jwtService.generateToken(user.getUsername())).thenReturn("mock-jwt-token");
+        when(jwtService.generateToken(user.getId())).thenReturn("mock-jwt-token");
 
         AuthResponse response = authService.login(loginRequest);
 

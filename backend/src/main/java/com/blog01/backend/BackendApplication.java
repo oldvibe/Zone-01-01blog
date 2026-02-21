@@ -19,7 +19,7 @@ public class BackendApplication {
     @Bean
     public CommandLineRunner initAdmin(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            if (userRepository.findByEmail("admin@blog.com").isEmpty()) {
+            if (userRepository.findByEmail("admin@blog.com").isEmpty() && !userRepository.existsByUsername("admin")) {
                 User admin = User.builder()
                         .username("admin")
                         .email("admin@blog.com")

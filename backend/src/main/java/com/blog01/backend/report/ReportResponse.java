@@ -17,6 +17,12 @@ public class ReportResponse {
 
     private Long targetId;
 
+    private Long targetOwnerId;
+
+    private String targetContent;
+
+    private String targetOwnerUsername;
+
     private String reporterUsername;
 
     private boolean resolved;

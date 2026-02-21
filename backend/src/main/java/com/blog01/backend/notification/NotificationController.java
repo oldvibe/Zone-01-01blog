@@ -37,4 +37,22 @@ public class NotificationController {
             @AuthenticationPrincipal UserDetails user) {
         notificationService.markAsRead(id, user.getUsername());
     }
+
+    /**
+     * 🔹 Mark notification as unread
+     */
+    @PostMapping("/{id}/unread")
+    public void markAsUnread(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails user) {
+        notificationService.markAsUnread(id, user.getUsername());
+    }
+
+    /**
+     * 🔹 Mark all notifications as read
+     */
+    @PostMapping("/read-all")
+    public void markAllAsRead(@AuthenticationPrincipal UserDetails user) {
+        notificationService.markAllAsRead(user.getUsername());
+    }
 }

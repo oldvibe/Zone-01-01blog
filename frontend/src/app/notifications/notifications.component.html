@@ -6,8 +6,13 @@
           <p class="text-primary fw-bold text-uppercase tracking-wider small mb-2">ACTIVITY FEED</p>
           <h1 class="section-title mb-0">NOTIFICATIONS</h1>
         </div>
-        <div class="small text-muted fw-bold" *ngIf="items().length">
-          {{ items().length }} ALERTS
+        <div class="d-flex align-items-center gap-3">
+          <button *ngIf="items().length" (click)="markAllRead()" class="btn btn-sm btn--ghost text-primary fw-bold tracking-wider" style="font-size: 0.75rem;">
+            <i class="bi bi-check-all me-1"></i> MARK ALL READ
+          </button>
+          <div class="small text-muted fw-bold" *ngIf="items().length">
+            {{ items().length }} ALERTS
+          </div>
         </div>
       </header>
 
@@ -29,9 +34,12 @@
                 </div>
               </div>
               
-              <button class="btn btn-sm fw-bold" [class.btn--ghost]="item.read" [class.btn-primary]="!item.read" [disabled]="item.read" (click)="markRead(item.id)">
-                <i class="bi" [class.bi-check2-circle]="item.read" [class.bi-check2]="!item.read"></i>
-                {{ item.read ? 'READ' : 'MARK' }}
+              <button class="btn btn-sm fw-bold px-3" 
+                      [class.btn--ghost]="item.read" 
+                      [class.btn-primary]="!item.read" 
+                      (click)="item.read ? markUnread(item.id) : markRead(item.id)">
+                <i class="bi" [class.bi-envelope-open]="item.read" [class.bi-envelope-fill]="!item.read"></i>
+                <span class="ms-1">{{ item.read ? 'UNREAD' : 'READ' }}</span>
               </button>
             </div>
           </article>

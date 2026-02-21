@@ -1,11 +1,12 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PostService } from './post.service';
 import { CommentService, CommentItem } from './comment.service';
 import { FollowService } from '../core/services/follow.service';
 import { ReportService } from '../core/services/report.service';
+import { FileService } from '../core/services/file.service';
 
 @Component({
   selector: 'app-post-detail',
@@ -22,11 +23,17 @@ export class PostDetailComponent implements OnInit {
   errorMessage = signal('');
   form: FormGroup;
   reportForm: FormGroup;
+  editForm: FormGroup;
   reporting = signal(false);
   reportMessage = signal('');
   commentReportMessage = signal('');
   followingIds = signal<Set<number>>(new Set());
   replyingToId = signal<number | null>(null);
+  editing = signal(false);
+
+  selectedFiles = signal<any[]>([]);
+  mediaPreviews = signal<{ url: string; isVideo: boolean; isAudio: boolean }[]>([]);
+  uploading = signal(false);
 
   constructor(
     private route: ActivatedRoute,
@@ -34,13 +41,18 @@ export class PostDetailComponent implements OnInit {
     private commentService: CommentService,
     private followService: FollowService,
     private reportService: ReportService,
-    private fb: FormBuilder
+    private fileService: FileService,
+    private fb: FormBuilder,
+    private router: Router
   ) {
     this.form = this.fb.group({
       content: ['', Validators.required]
     });
     this.reportForm = this.fb.group({
       reason: ['', Validators.required]
+    });
+    this.editForm = this.fb.group({
+      content: ['', Validators.required]
     });
   }
 
@@ -74,6 +86,8 @@ export class PostDetailComponent implements OnInit {
         this.loading.set(false);
         if (!this.post()) {
           this.errorMessage.set('Post not found.');
+        } else {
+          this.editForm.patchValue({ content: this.post().content });
         }
       },
       error: (err) => {
@@ -82,6 +96,116 @@ export class PostDetailComponent implements OnInit {
         this.errorMessage.set('Failed to load post.');
       }
     });
+  }
+
+  startEdit() {
+    this.editing.set(true);
+    this.editForm.patchValue({ content: this.post().content });
+    this.selectedFiles.set(this.post().mediaUrls || []);
+    this.mediaPreviews.set((this.post().mediaUrls || []).map((url: string) => ({
+      url,
+      isVideo: this.isVideo(url),
+      isAudio: this.isAudio(url)
+    })));
+  }
+
+  cancelEdit() {
+    this.editing.set(false);
+    this.mediaPreviews().forEach(p => {
+      if (p.url.startsWith('blob:')) URL.revokeObjectURL(p.url);
+    });
+    this.mediaPreviews.set([]);
+    this.selectedFiles.set([]);
+  }
+
+  updatePost() {
+    if (this.editForm.invalid || !this.post()?.id) return;
+    
+    this.uploading.set(true);
+    const { content } = this.editForm.value;
+    const mediaUrls: string[] = [];
+
+    const submit = () => {
+      this.postService.update(this.post().id, content, mediaUrls).subscribe({
+        next: (updated) => {
+          this.post.set(updated);
+          this.editing.set(false);
+          this.uploading.set(false);
+          this.mediaPreviews().forEach(p => {
+            if (p.url.startsWith('blob:')) URL.revokeObjectURL(p.url);
+          });
+        },
+        error: (err) => {
+          console.error(err);
+          this.uploading.set(false);
+        }
+      });
+    };
+
+    const files = this.selectedFiles();
+    if (files.length > 0) {
+      let uploadedCount = 0;
+      files.forEach(file => {
+        if (typeof file === 'string') {
+          mediaUrls.push(file);
+          uploadedCount++;
+          if (uploadedCount === files.length) submit();
+          return;
+        }
+
+        this.fileService.upload(file).subscribe({
+          next: (path: string) => {
+            mediaUrls.push(path);
+            uploadedCount++;
+            if (uploadedCount === files.length) submit();
+          },
+          error: (err: any) => {
+            console.error(err);
+            this.uploading.set(false);
+          }
+        });
+      });
+    } else {
+      submit();
+    }
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    
+    const remaining = 3 - this.selectedFiles().length;
+    if (remaining <= 0) return;
+
+    Array.from(input.files).slice(0, remaining).forEach(file => {
+      this.selectedFiles.update(files => [...files, file]);
+      const url = URL.createObjectURL(file);
+      this.mediaPreviews.update(previews => [...previews, { 
+        url, 
+        isVideo: file.type.startsWith('video'),
+        isAudio: file.type.startsWith('audio')
+      }]);
+    });
+    input.value = '';
+  }
+
+  removeMedia(index: number) {
+    const removed = this.mediaPreviews()[index];
+    if (removed && removed.url.startsWith('blob:')) {
+      URL.revokeObjectURL(removed.url);
+    }
+    this.mediaPreviews.update(previews => previews.filter((_, i) => i !== index));
+    this.selectedFiles.update(files => files.filter((_, i) => i !== index));
+  }
+
+  deletePost() {
+    if (!this.post()?.id) return;
+    if (confirm('Are you sure you want to delete this post?')) {
+      this.postService.delete(this.post().id).subscribe({
+        next: () => this.router.navigate(['/posts']),
+        error: (err) => console.error(err)
+      });
+    }
   }
 
   loadComments(postId: number) {
@@ -151,6 +275,11 @@ export class PostDetailComponent implements OnInit {
       this.reportForm.markAllAsTouched();
       return;
     }
+
+    if (!confirm('Are you sure you want to submit this report?')) {
+      return;
+    }
+
     const reason = this.reportForm.value.reason;
     this.reportService
       .create({ reason, targetType: 'POST', targetId: this.post()!.id })
@@ -171,6 +300,11 @@ export class PostDetailComponent implements OnInit {
     if (!comment?.id) {
       return;
     }
+
+    if (!confirm('Are you sure you want to report this comment?')) {
+      return;
+    }
+
     this.reportService
       .create({ reason: 'Inappropriate comment', targetType: 'COMMENT', targetId: comment.id })
       .subscribe({
@@ -272,6 +406,11 @@ export class PostDetailComponent implements OnInit {
 
   isVideo(url: string): boolean {
     const extensions = ['.mp4', '.webm', '.ogg', '.mov'];
+    return extensions.some(ext => url.toLowerCase().endsWith(ext));
+  }
+
+  isAudio(url: string): boolean {
+    const extensions = ['.mp3', '.wav', '.aac', '.m4a', '.flac'];
     return extensions.some(ext => url.toLowerCase().endsWith(ext));
   }
 }

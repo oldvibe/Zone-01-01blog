@@ -24,15 +24,15 @@ export class UserService {
     return this.http.get<UserProfile>(`${this.api}/${username}`);
   }
 
-  myPosts(page = 0, size = 10) {
+  myPosts(page = 0, size = 50) {
     return this.http.get<any>(`${this.api}/me/posts?page=${page}&size=${size}`);
   }
 
-  postsByUsername(username: string, page = 0, size = 10) {
+  postsByUsername(username: string, page = 0, size = 50) {
     return this.http.get<any>(`${this.api}/${username}/posts?page=${page}&size=${size}`);
   }
 
-  updateMe(data: { username?: string; email?: string }) {
+  updateMe(data: { username?: string; email?: string; password?: string }) {
     return this.http.put<UserProfile>(`${this.api}/me`, data);
   }
 }

@@ -50,7 +50,7 @@ public class AuthService {
         userRepository.save(user);
         log.info("User registered successfully: {}", user.getUsername());
 
-        String token = jwtService.generateToken(user.getUsername());
+        String token = jwtService.generateToken(user.getId());
         return new AuthResponse(token);
     }
 
@@ -73,7 +73,7 @@ public class AuthService {
             throw new ApiException(HttpStatus.FORBIDDEN, "Your account has been banned");
         }
 
-        String token = jwtService.generateToken(user.getUsername());
+        String token = jwtService.generateToken(user.getId());
         log.info("User logged in successfully: {}", user.getUsername());
         
         return new AuthResponse(token);

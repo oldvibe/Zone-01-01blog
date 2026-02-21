@@ -16,6 +16,7 @@ import java.util.List;
 public class UserService {
 
 	private final UserRepository userRepository;
+	private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
 	private UserResponse toResponse(User u) {
 		return new UserResponse(
@@ -55,28 +56,38 @@ public class UserService {
 	}
 
 	public void delete(Long id) {
-		if (!userRepository.existsById(id)) {
-			throw new ApiException(HttpStatus.NOT_FOUND, "User not found");
+		User user = userRepository.findById(id)
+				.orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+		
+		if (user.getRole() == com.blog01.backend.common.enums.Role.ROLE_ADMIN) {
+			throw new ApiException(HttpStatus.FORBIDDEN, "Administrative accounts cannot be deleted");
 		}
-		userRepository.deleteById(id);
+		
+		userRepository.delete(user);
 	}
 
 	public UserResponse updateProfile(Long id, UpdateUserRequest request) {
 		User user = userRepository.findById(id)
 				.orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 
-		if (request.getUsername() != null && !request.getUsername().equals(user.getUsername())) {
+		// Prevent updating to an existing username
+		if (request.getUsername() != null && !request.getUsername().isBlank() && !request.getUsername().equals(user.getUsername())) {
 			if (userRepository.existsByUsername(request.getUsername())) {
 				throw new ApiException(HttpStatus.CONFLICT, "Username already taken");
 			}
-			user.setUsername(request.getUsername());
+			user.setUsername(request.getUsername().trim());
 		}
 
-		if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
+		// Prevent updating to an existing email
+		if (request.getEmail() != null && !request.getEmail().isBlank() && !request.getEmail().equals(user.getEmail())) {
 			if (userRepository.existsByEmail(request.getEmail())) {
 				throw new ApiException(HttpStatus.CONFLICT, "Email already taken");
 			}
-			user.setEmail(request.getEmail());
+			user.setEmail(request.getEmail().trim().toLowerCase());
+		}
+
+		if (request.getPassword() != null && !request.getPassword().isBlank()) {
+			user.setPassword(passwordEncoder.encode(request.getPassword()));
 		}
 
 		userRepository.save(user);

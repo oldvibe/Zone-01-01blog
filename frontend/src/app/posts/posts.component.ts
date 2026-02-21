@@ -22,12 +22,13 @@ export class PostsComponent implements OnInit, OnDestroy {
   form: FormGroup;
   reportForm: FormGroup;
   selectedFiles = signal<File[]>([]);
-  mediaPreviews = signal<{ url: string; isVideo: boolean }[]>([]);
+  mediaPreviews = signal<{ url: string; isVideo: boolean; isAudio: boolean }[]>([]);
   mediaPreview = signal<string | null>(null);
   mediaPreviewIsVideo = signal(false);
   feedMode = signal<'public' | 'subscriptions'>('public');
   followingIds = signal<Set<number>>(new Set());
   reportingPostId = signal<number | null>(null);
+  editingPostId = signal<number | null>(null);
   reportMessage = signal('');
 
   constructor(
@@ -116,7 +117,8 @@ export class PostsComponent implements OnInit, OnDestroy {
       const url = URL.createObjectURL(file);
       this.mediaPreviews.update(previews => [...previews, {
         url: url,
-        isVideo: file.type.startsWith('video')
+        isVideo: file.type.startsWith('video'),
+        isAudio: file.type.startsWith('audio')
       }]);
     });
     // Reset input to allow selecting same file again if removed
@@ -141,29 +143,50 @@ export class PostsComponent implements OnInit, OnDestroy {
     const mediaUrls: string[] = [];
 
     const submit = () => {
-      this.postService.create(content, mediaUrls).subscribe({
-        next: (created) => {
-          this.form.reset();
-          this.selectedFiles.set([]);
-          this.mediaPreviews().forEach(p => URL.revokeObjectURL(p.url));
-          this.mediaPreviews.set([]);
-          if (created) {
-            this.posts.update(posts => [created, ...posts]);
-          } else {
-            this.loadFeed();
+      if (this.editingPostId()) {
+        this.postService.update(this.editingPostId()!, content, mediaUrls).subscribe({
+          next: (updated: any) => {
+            this.posts.update(posts => posts.map(p => p.id === updated.id ? updated : p));
+            this.cancelEdit();
+          },
+          error: (err) => {
+            this.errorMessage.set('Failed to update post.');
+            console.error(err);
           }
-        },
-        error: (err) => {
-          this.errorMessage.set('Failed to create post.');
-          console.error(err);
-        }
-      });
+        });
+      } else {
+        this.postService.create(content, mediaUrls).subscribe({
+          next: (created) => {
+            this.form.reset();
+            this.selectedFiles.set([]);
+            this.mediaPreviews().forEach(p => URL.revokeObjectURL(p.url));
+            this.mediaPreviews.set([]);
+            if (created) {
+              this.posts.update(posts => [created, ...posts]);
+            } else {
+              this.loadFeed();
+            }
+          },
+          error: (err) => {
+            this.errorMessage.set('Failed to create post.');
+            console.error(err);
+          }
+        });
+      }
     };
 
     if (this.selectedFiles().length > 0) {
       let uploadedCount = 0;
       const files = this.selectedFiles();
       files.forEach(file => {
+        // If it's an existing URL (string), don't re-upload
+        if (typeof file === 'string') {
+          mediaUrls.push(file);
+          uploadedCount++;
+          if (uploadedCount === files.length) submit();
+          return;
+        }
+
         this.fileService.upload(file).subscribe({
           next: (path) => {
             mediaUrls.push(path);
@@ -181,6 +204,36 @@ export class PostsComponent implements OnInit, OnDestroy {
     } else {
       submit();
     }
+  }
+
+  startEdit(post: any) {
+    this.editingPostId.set(post.id);
+    this.form.patchValue({ content: post.content });
+    
+    // Clear previous previews
+    this.mediaPreviews().forEach(p => {
+      if (p.url.startsWith('blob:')) URL.revokeObjectURL(p.url);
+    });
+    
+    this.selectedFiles.set(post.mediaUrls || []);
+    this.mediaPreviews.set((post.mediaUrls || []).map((url: string) => ({
+      url,
+      isVideo: this.isVideo(url),
+      isAudio: this.isAudio(url)
+    })));
+
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  cancelEdit() {
+    this.editingPostId.set(null);
+    this.form.reset();
+    this.mediaPreviews().forEach(p => {
+      if (p.url.startsWith('blob:')) URL.revokeObjectURL(p.url);
+    });
+    this.mediaPreviews.set([]);
+    this.selectedFiles.set([]);
   }
 
   toggleLike(post: any) {
@@ -238,6 +291,11 @@ export class PostsComponent implements OnInit, OnDestroy {
       this.reportForm.markAllAsTouched();
       return;
     }
+
+    if (!confirm('Are you sure you want to submit this report?')) {
+      return;
+    }
+
     const reason = this.reportForm.value.reason;
     this.reportService
       .create({ reason, targetType: 'POST', targetId: post.id })
@@ -313,6 +371,11 @@ export class PostsComponent implements OnInit, OnDestroy {
 
   isVideo(url: string): boolean {
     const extensions = ['.mp4', '.webm', '.ogg', '.mov'];
+    return extensions.some(ext => url.toLowerCase().endsWith(ext));
+  }
+
+  isAudio(url: string): boolean {
+    const extensions = ['.mp3', '.wav', '.aac', '.m4a', '.flac'];
     return extensions.some(ext => url.toLowerCase().endsWith(ext));
   }
 

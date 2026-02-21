@@ -50,5 +50,39 @@ export class NotificationsComponent implements OnInit {
       },
     });
   }
+
+  markUnread(id: number) {
+    this.notificationService.markUnread(id).subscribe({
+      next: () => {
+        this.items.update(items => items.map((n) =>
+          n.id === id ? { ...n, read: false } : n
+        ));
+        this.notificationService.refreshUnreadCount().subscribe();
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+  }
+
+  markAllRead() {
+    if (this.items().every(n => n.read)) return;
+    
+    this.notificationService.markAllRead().subscribe({
+      next: () => {
+        this.items.update(items => items.map(n => ({ ...n, read: true })));
+        this.notificationService.refreshUnreadCount().subscribe();
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+  }
+
+  formatDate(value: string) {
+    if (!value) return '';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
+  }
 }
 

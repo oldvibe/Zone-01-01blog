@@ -32,7 +32,7 @@ public class FileService {
             if (!isAllowedType(mimeType)) {
                 log.warn("File type not allowed: {}", mimeType);
                 throw new ApiException(HttpStatus.BAD_REQUEST, 
-                    "Invalid file type. We only accept images (JPEG, PNG, GIF) and videos (MP4, WEBM).");
+                    "Invalid file type. We only accept images, videos, and audio files.");
             }
 
             Files.createDirectories(Path.of(uploadDir));
@@ -49,6 +49,6 @@ public class FileService {
     }
 
     private boolean isAllowedType(String mimeType) {
-        return mimeType.startsWith("image/") || mimeType.startsWith("video/");
+        return mimeType.startsWith("image/") || mimeType.startsWith("video/") || mimeType.startsWith("audio/");
     }
 }

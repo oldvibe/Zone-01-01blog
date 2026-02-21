@@ -24,9 +24,9 @@ public class JwtService {
     // =========================
     // GENERATE TOKEN
     // =========================
-    public String generateToken(String username) {
+    public String generateToken(Long user_id) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(user_id.toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
@@ -34,18 +34,18 @@ public class JwtService {
     }
 
     // =========================
-    // EXTRACT USERNAME
+    // EXTRACT USER ID
     // =========================
-    public String extractUsername(String token) {
+    public String extractUserId(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
     // =========================
     // VALIDATE TOKEN
     // =========================
-    public boolean isTokenValid(String token, String username) {
-        final String extractedUsername = extractUsername(token);
-        return (extractedUsername.equals(username)) && !isTokenExpired(token);
+    public boolean isTokenValid(String token, String userId) {
+        final String extractedId = extractUserId(token);
+        return (extractedId.equals(userId)) && !isTokenExpired(token);
     }
 
     // =========================

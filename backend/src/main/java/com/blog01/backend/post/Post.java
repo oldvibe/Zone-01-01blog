@@ -29,5 +29,11 @@ public class Post {
     @ManyToOne
     private User author;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<com.blog01.backend.comment.Comment> comments;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<com.blog01.backend.like.PostLike> likes;
+
     private LocalDateTime createdAt;
 }

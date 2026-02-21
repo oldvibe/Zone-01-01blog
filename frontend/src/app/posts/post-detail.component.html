@@ -23,19 +23,60 @@
             </div>
           </div>
           
+          <div class="d-flex gap-2" *ngIf="post().mine">
+            <button class="btn btn-sm btn--ghost text-primary fw-bold" (click)="startEdit()">
+              <i class="bi bi-pencil-fill me-1"></i>EDIT
+            </button>
+            <button class="btn btn-sm btn--ghost text-danger fw-bold" (click)="deletePost()">
+              <i class="bi bi-trash3-fill me-1"></i>DELETE
+            </button>
+          </div>
+          
           <button class="btn btn-sm" [class.btn-primary]="!isFollowingAuthor()" [class.btn-outline-primary]="isFollowingAuthor()" *ngIf="!post().mine" (click)="toggleFollow()">
             {{ isFollowingAuthor() ? 'Unsync' : 'Sync Identity' }}
           </button>
         </header>
 
-        <div class="post-body mb-5">
+        <!-- Editing View -->
+        <div *ngIf="editing()" class="mb-5">
+          <form [formGroup]="editForm" (ngSubmit)="updatePost()">
+            <textarea rows="5" class="form-control mb-3" formControlName="content"></textarea>
+            
+            <div class="media-preview-grid mb-3" *ngIf="mediaPreviews().length">
+              <div *ngFor="let media of mediaPreviews(); let i = index" class="media-item border-primary">
+                <button type="button" class="btn-remove-media" (click)="removeMedia(i)" title="Remove">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+                <video *ngIf="media.isVideo" [src]="media.url" muted controls></video>
+                <audio *ngIf="media.isAudio" [src]="media.url" controls class="w-100"></audio>
+                <img *ngIf="!media.isVideo && !media.isAudio" [src]="media.url" alt="Preview" />
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+              <label for="mediaEdit" class="btn btn-sm btn--ghost fw-bold" style="cursor: pointer;">
+                <i class="bi bi-camera-reels-fill text-primary me-2"></i>REPLACE/ADD MEDIA
+                <input id="mediaEdit" type="file" multiple (change)="onFileSelected($event)" class="d-none" />
+              </label>
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4" [disabled]="editForm.invalid || uploading()">
+                  {{ uploading() ? 'Uploading...' : 'Save Changes' }}
+                </button>
+                <button type="button" class="btn btn--ghost" (click)="cancelEdit()" [disabled]="uploading()">Cancel</button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="post-body mb-5" *ngIf="!editing()">
           {{ post().content }}
         </div>
 
         <div class="media-grid mb-5" *ngIf="post().mediaUrls?.length">
           @for (url of post().mediaUrls; track url) {
-            <img *ngIf="!isVideo(url)" [src]="url" class="img-fluid" alt="Intel visual" />
+            <img *ngIf="!isVideo(url) && !isAudio(url)" [src]="url" class="img-fluid" alt="Intel visual" />
             <video *ngIf="isVideo(url)" [src]="url" controls class="w-100 rounded-4"></video>
+            <audio *ngIf="isAudio(url)" [src]="url" controls class="w-100 rounded-4"></audio>
           }
         </div>
 

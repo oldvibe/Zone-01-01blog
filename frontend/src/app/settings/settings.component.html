@@ -8,7 +8,13 @@
         </header>
 
         <p *ngIf="loading()" class="text-center fw-bold">SYNCHRONIZING...</p>
-        <p *ngIf="errorMessage()" class="text-danger text-center fw-bold">{{ errorMessage() }}</p>
+        
+        <div *ngIf="errorMessage()" class="alert alert-danger py-2 rounded-3 small fw-bold text-center mb-3">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorMessage() }}
+        </div>
+        <div *ngIf="successMessage()" class="alert alert-success py-2 rounded-3 small fw-bold text-center mb-3">
+          <i class="bi bi-check-circle-fill me-2"></i>{{ successMessage() }}
+        </div>
 
         <form [formGroup]="form" (ngSubmit)="saveProfile()" *ngIf="!loading()">
           <div class="mb-3">
@@ -18,6 +24,10 @@
           <div class="mb-3">
             <label class="form-label small fw-bold text-primary">EMAIL ADDRESS</label>
             <input type="email" class="form-control rounded-3" formControlName="email" />
+          </div>
+          <div class="mb-4">
+            <label class="form-label small fw-bold text-primary">NEW PASSWORD (OPTIONAL)</label>
+            <input type="password" class="form-control rounded-3" formControlName="password" placeholder="Leave blank to keep current" />
           </div>
           <button type="submit" class="btn btn-primary w-100 py-3 rounded-3 fw-bold" [disabled]="loading()">
             UPDATE PROFILE

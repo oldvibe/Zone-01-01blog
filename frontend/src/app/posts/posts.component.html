@@ -36,7 +36,11 @@
       </div>
 
       <!-- Post Composer -->
-      <form class="card p-4 mb-4 composer-card shadow-lg" [formGroup]="form" (ngSubmit)="createPost()">
+      <form class="card p-4 mb-4 composer-card shadow-lg" [formGroup]="form" (ngSubmit)="createPost()" [class.border-primary]="editingPostId()">
+        <div class="d-flex justify-content-between align-items-center mb-3" *ngIf="editingPostId()">
+          <span class="badge bg-primary fw-bold">EDITING POST</span>
+          <button type="button" class="btn btn-sm btn--ghost text-muted fw-bold" (click)="cancelEdit()">CANCEL</button>
+        </div>
         <div class="d-flex gap-3 mb-3">
           <div class="avatar-sm flex-shrink-0">
             <i class="bi bi-plus-lg"></i>
@@ -52,7 +56,8 @@
               <i class="bi bi-x-lg"></i>
             </button>
             <video *ngIf="media.isVideo" [src]="media.url" muted controls></video>
-            <img *ngIf="!media.isVideo" [src]="media.url" alt="Preview" />
+            <audio *ngIf="media.isAudio" [src]="media.url" controls class="w-100"></audio>
+            <img *ngIf="!media.isVideo && !media.isAudio" [src]="media.url" alt="Preview" />
           </div>
         </div>
 
@@ -66,7 +71,7 @@
             </label>
           </div>
           <button class="btn btn-primary px-5 fw-bold" type="submit" [disabled]="form.invalid || loading()">
-            POST
+            {{ editingPostId() ? 'UPDATE' : 'POST' }}
           </button>
         </div>
       </form>
@@ -97,9 +102,14 @@
                 <button class="btn btn--ghost btn-sm fw-bold" *ngIf="!post.mine" (click)="toggleFollow(post)">
                   {{ isFollowing(post) ? 'UNFOLLOW' : 'FOLLOW' }}
                 </button>
-                <button class="btn btn--ghost btn-sm text-danger fw-bold" *ngIf="post.mine" (click)="deletePost(post.id)">
-                  <i class="bi bi-trash3-fill"></i>
-                </button>
+                <div class="d-flex gap-1" *ngIf="post.mine">
+                  <button class="btn btn--ghost btn-sm text-primary fw-bold" (click)="startEdit(post)">
+                    <i class="bi bi-pencil-fill"></i>
+                  </button>
+                  <button class="btn btn--ghost btn-sm text-danger fw-bold" (click)="deletePost(post.id)">
+                    <i class="bi bi-trash3-fill"></i>
+                  </button>
+                </div>
               </div>
             </header>
 
@@ -107,8 +117,9 @@
 
             <div class="media-grid" *ngIf="post.mediaUrls?.length" style="cursor: pointer;" [routerLink]="['/posts', post.id]">
               @for (url of post.mediaUrls; track url) {
-                <img *ngIf="!isVideo(url)" [src]="url" alt="Media" loading="lazy" class="shadow-sm" />
+                <img *ngIf="!isVideo(url) && !isAudio(url)" [src]="url" alt="Media" loading="lazy" class="shadow-sm" />
                 <video *ngIf="isVideo(url)" [src]="url" muted controls class="shadow-sm"></video>
+                <audio *ngIf="isAudio(url)" [src]="url" controls class="w-100 shadow-sm custom-audio"></audio>
               }
             </div>
 
